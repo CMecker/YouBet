@@ -22,7 +22,7 @@ Den public Key findet ihr in der Datei
 Diesen im Github unter Profile>Settings>SSH_and_GPG_keys hinzufuegen
 
 Zurück zum Path wo ihr euer Repo speichern wollt
-_git clone https://github.com/CMecker/YouBet.git_
+_git clone github.com/CMecker/YouBet.git_
 
 ##Shortcuts
 _git config --global alias.co checkout_
