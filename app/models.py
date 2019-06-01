@@ -58,12 +58,23 @@ class User(UserMixin, db.Model):
         secondaryjoin=(followers.c.followed_id == id),
         backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
+#NEEDING Delete Option
+class Event(db.Model):
+
+    def __repr__(self):
+        return '<Event {}>'.format(self.eventname)
+
+    id = db.Column(db.Integer, primary_key=True)
+    eventname = db.Column(db.String(64), index=True, unique=True)
+    posts = db.relationship('Post', backref='title')
+
 class Post(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
@@ -79,3 +90,4 @@ class Post(db.Model):
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+

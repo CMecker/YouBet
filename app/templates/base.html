@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block navbar %}
-    <nav class="navbar navbar-default">
+<nav class="navbar navbar-default">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -20,6 +20,7 @@
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url_for('index') }}">Home</a></li>
                     <li><a href="{{ url_for('search') }}">Explore</a></li>
+                    <li><a href="{{ url_for('event') }}">Upcoming</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if current_user.is_anonymous %}
@@ -43,10 +44,11 @@
             {% endfor %}
         {% endif %}
         {% endwith %}
-
 	{% block app_content %}{% endblock %}
-        {# application content needs to be provided in the app_content block #}
     </div>
 {% endblock %}
 
-
+{% block scripts %}
+    {{ super() }}
+    {{ moment.include_moment() }}
+{% endblock %}

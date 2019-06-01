@@ -1,11 +1,12 @@
 from flask import render_template, redirect, flash, url_for, request
-from app import app, db
-from app.forms import LoginForm, EditProfileForm
+from app.ref import ref_bp 
 from flask_login import current_user, login_user, login_required, logout_user
-from app.models import User, Post
-from app.forms import RegistrationForm, EditProfileForm, PostForm
+from app.models import User, Post, Event
+from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm
 from datetime import datetime
+from app import app, db
 
+import sqlite3
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -19,6 +20,16 @@ def index():
         db.session.commit()
         flash('Your post is now live!')
         return redirect(url_for('index'))
+    posts = [
+        {
+            'author': {'username': 'Bran'},
+            'body': 'Best game eva!'
+        },
+        {
+            'author': {'username': 'test'},
+            'body': 'chat some!'
+        }
+    ]
     page = request.args.get('page', 1, type=int)
     posts = current_user.followed_posts().paginate(
         page, app.config['POSTS_PER_PAGE'], False)
@@ -116,12 +127,46 @@ def unfollow(username):
     flash('You are not following {}.'.format(username))
     return redirect(url_for('user', username=username))
 
+@app.route('/create_event', methods=['GET', 'POST'])
+@login_required
+def create_event():
+    form = EventRegistrationForm()
+    if form.validate_on_submit():
+        event = Event(eventname=form.eventname.data)
+        db.session.add(event)
+        db.session.commit()
+        flash('Creation succeded!')
+        return redirect(url_for('event'))
+    return render_template('events/create_event.html', title='CreateEvent', form=form)
+
+@app.route('/event')
+@login_required
+def event():
+    c = sqlite3.connect('app.db')
+    cur = c.cursor()
+    cur.execute("SELECT * from Event")
+    test = cur.fetchall()
+    eventlist = []
+    for ev in test:
+        eventlist.append({'id': ev[0], 'name': ev[1]})
+    post = {'title': event, 'body': eventlist},
+    return render_template('events/event.html', posts=post)
+
+@app.route('/event/<eventname>')
+@login_required
+def event_profile(eventname):
+    event = Event.query.filter_by(eventname=eventname).first_or_404()
+    posts = [
+        {'title': event, 'body': ''},
+    ]
+    return render_template('events/event_profile.html', event=event, posts=posts)
+
+#explore
 @app.route('/search')
 @login_required
 def search():
     page = request.args.get('page', 1, type=int)
-    posts = Post.query.order_by(Post.timestamp.desc()).paginate(
-        page, app.config['POSTS_PER_PAGE'], False)
+    posts = Post.query.order_by(Post.timestamp.desc()).paginate(page, app.config['POSTS_PER_PAGE'], False)
     next_url = url_for('search', page=posts.next_num) \
         if posts.has_next else None
     prev_url = url_for('search', page=posts.prev_num) \
@@ -134,5 +179,10 @@ def before_request():
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
+
+
+@app.route('/hello')
+def hello_world():
+	return 'Hello, World!'
 
 
