@@ -30,7 +30,7 @@ virtualenv venv
 ### Run Flask
 
 pip install -r requirements.txt  
-export FLASK_APP=app.py  
+export FLASK_APP=main.py  
 flask db upgrade  
 flask db migrate -m "Changed db"(if changes made)  
 flask run  
