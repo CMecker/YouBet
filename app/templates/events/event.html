@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <h1>Let's see what we got for you: </h1>
+    <hr>
+    <div class="btn-group" role="group" aria-label="EventTasks">
+        <button type="button" class="btn btn-secondary">
+            <a href="{{ url_for('create_event') }}">Create</a>
+        </button>
+    </div>
+    {% for post in posts %}
+        <p>
+        Post Body: <b>{{ post.body }}</b>
+        </p>
+        <table class="table">
+            <thead>
+                <tr>
+                    {% for k in post.body[0].keys() %}
+                        <th scope="col"> {{ k }} </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for ev in post.body %}
+                    <tr>
+                        <th scope="row"> {{ ev['id'] }} </th>
+                        <td> <a href="{{ url_for('event_profile', eventname=ev['name']) }}">{{ ev['name'] }}</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+{% endblock %}
+

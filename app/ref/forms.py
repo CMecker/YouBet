@@ -1,14 +1,13 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError, DataRequired, Email, EqualTo, Length
-from app.models import User
+from app.models import User, Event
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
-
 
 class RegistrationForm(FlaskForm):
 
@@ -28,6 +27,15 @@ class RegistrationForm(FlaskForm):
     password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
 
+class EventRegistrationForm(FlaskForm):
+
+    def validate_eventname(self, eventname):
+        event = Event.query.filter_by(eventname=eventname.data).first()
+        if event is not None:
+            raise ValidationError('Unvalid eventname.')
+
+    eventname = StringField('Eventname', validators=[DataRequired()])
+    submit = SubmitField('Create')
 
 class EditProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
