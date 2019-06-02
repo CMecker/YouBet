@@ -127,7 +127,24 @@ def unfollow(username):
     flash('You are not following {}.'.format(username))
     return redirect(url_for('user', username=username))
 
-@app.route('/create_event', methods=['GET', 'POST'])
+@app.route('/set_coins/<username>')
+@login_required
+def set_coins(username):
+    user = User.query.filter_by(username=username).first()
+    admin = User.query.filter_by(username='admin').first()
+    if user is None:
+        flash('User {} not found.'.format(username))
+        return redirect(url_for('index'))
+    if current_user.username != 'admin':
+        flash('You are no Admin.')
+        return redirect(url_for('user', username=username))
+    user.set_coins(user, 10)
+    db.session.commit()
+    flash('You spent {} some coins!'.format(username))
+    return redirect(url_for('user', username=username))
+
+
+@app.route('/event/create_event', methods=['GET', 'POST'])
 @login_required
 def create_event():
     form = EventRegistrationForm()
