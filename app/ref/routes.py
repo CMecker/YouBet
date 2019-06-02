@@ -159,13 +159,10 @@ def create_event():
 @app.route('/event')
 @login_required
 def event():
-    c = sqlite3.connect('app.db')
-    cur = c.cursor()
-    cur.execute("SELECT * from Event")
-    test = cur.fetchall()
+    que = Event.query.all()
     eventlist = []
-    for ev in test:
-        eventlist.append({'id': ev[0], 'name': ev[1]})
+    for eve in que:
+        eventlist.append({'id': eve.id, 'name': eve.eventname})
     post = {'title': event, 'body': eventlist},
     return render_template('events/event.html', posts=post)
 
