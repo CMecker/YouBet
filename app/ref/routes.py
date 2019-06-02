@@ -127,7 +127,24 @@ def unfollow(username):
     flash('You are not following {}.'.format(username))
     return redirect(url_for('user', username=username))
 
-@app.route('/create_event', methods=['GET', 'POST'])
+@app.route('/set_coins/<username>')
+@login_required
+def set_coins(username):
+    user = User.query.filter_by(username=username).first()
+    admin = User.query.filter_by(username='admin').first()
+    if user is None:
+        flash('User {} not found.'.format(username))
+        return redirect(url_for('index'))
+    if current_user.username != 'admin':
+        flash('You are no Admin.')
+        return redirect(url_for('user', username=username))
+    user.set_coins(user, 10)
+    db.session.commit()
+    flash('You spent {} some coins!'.format(username))
+    return redirect(url_for('user', username=username))
+
+
+@app.route('/event/create_event', methods=['GET', 'POST'])
 @login_required
 def create_event():
     form = EventRegistrationForm()
@@ -142,13 +159,10 @@ def create_event():
 @app.route('/event')
 @login_required
 def event():
-    c = sqlite3.connect('app.db')
-    cur = c.cursor()
-    cur.execute("SELECT * from Event")
-    test = cur.fetchall()
+    que = Event.query.all()
     eventlist = []
-    for ev in test:
-        eventlist.append({'id': ev[0], 'name': ev[1]})
+    for eve in que:
+        eventlist.append({'id': eve.id, 'name': eve.eventname})
     post = {'title': event, 'body': eventlist},
     return render_template('events/event.html', posts=post)
 
