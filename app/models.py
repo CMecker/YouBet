@@ -31,7 +31,11 @@ class User(UserMixin, db.Model):
 
     def is_following(self, user):
         return self.followed.filter(
-            followers.c.followed_id == user.id).count() > 0
+            followers.c.followed_id == user.id
+            ).count() > 0
+
+    def set_coins(self, user, amount):
+        self.coins = amount 
 
     def followed_posts(self):
         followed = Post.query.join(
@@ -51,6 +55,7 @@ class User(UserMixin, db.Model):
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+    coins = db.Column(db.Integer)
 
     followed = db.relationship(
         'User', secondary=followers,
