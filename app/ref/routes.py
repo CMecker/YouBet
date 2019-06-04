@@ -2,12 +2,9 @@ from flask import render_template, redirect, flash, url_for, request
 from app.ref import ref_bp 
 from flask_login import current_user, login_user, login_required, logout_user
 from app.models import User, Post, Event
-from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm
+from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm
 from datetime import datetime
 from app import app, db
-
-import sqlite3
-
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -94,8 +91,18 @@ def edit_profile():
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
-    return render_template('auth/edit_profile.html', title='Edit Profile',
-                           form=form)
+    return render_template('auth/edit_profile.html', title='Edit Profile', form=form)
+@app.route('/event/<eventname>/bet')
+@login_required
+def event_bet(eventname):
+    form = EventBetForm(current_user.username)
+    event = Event.query.filter_by(eventname=eventname).first_or_404()
+    if form.validate_on_submit():
+        event = Event.query.filter_by(eventname=eventname).first_or_404()
+    posts = [
+        {'title': event, 'body': ''},
+    ]
+    return render_template('events/event_bet.html', title='Bet Event', form=form)
 
 @app.route('/follow/<username>')
 @login_required
@@ -150,9 +157,9 @@ def create_event():
     form = EventRegistrationForm()
     if form.validate_on_submit():
         event = Event(eventname=form.eventname.data, time_to_bet=form.time_to_bet.data)
-        import pdb;pdb.set_trace()
+        time_to_bet = form.time_to_bet.data
+        import pdb; pdb.set_trace()
         db.session.add(event)
-        db.session.add(time_to_bet)
         db.session.commit()
         flash('Creation succeded!')
         return redirect(url_for('event'))
@@ -164,7 +171,11 @@ def event():
     que = Event.query.all()
     eventlist = []
     for eve in que:
-        eventlist.append({'id': eve.id, 'name': eve.eventname})
+        if not eve.amount:
+            eve.amount=0
+        if not eve.betting_quote:
+            eve.betting_quote='(0,5/0,5)'
+        eventlist.append({'id': eve.id, 'name': eve.eventname, 'time_to_bet': eve.time_to_bet, 'amount': eve.amount, 'betting_quote': eve.betting_quote})
     post = {'title': event, 'body': eventlist},
     return render_template('events/event.html', posts=post)
 
@@ -176,6 +187,7 @@ def event_profile(eventname):
         {'title': event, 'body': ''},
     ]
     return render_template('events/event_profile.html', event=event, posts=posts)
+
 
 #explore
 @app.route('/search')

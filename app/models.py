@@ -55,7 +55,7 @@ class User(UserMixin, db.Model):
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
-    coins = db.Column(db.Integer)
+    coins = db.Column(db.Integer, default=10)
 
     followed = db.relationship(
         'User', secondary=followers,
@@ -72,6 +72,8 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     eventname = db.Column(db.String(64), index=True, unique=True)
     time_to_bet = db.Column(db.DateTime)
+    amount = db.Column(db.Integer)
+    betting_quote = db.Column(db.String(30))
     posts = db.relationship('Post', backref='title')
 
 class Post(db.Model):
