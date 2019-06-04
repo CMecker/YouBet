@@ -149,8 +149,10 @@ def set_coins(username):
 def create_event():
     form = EventRegistrationForm()
     if form.validate_on_submit():
-        event = Event(eventname=form.eventname.data)
+        event = Event(eventname=form.eventname.data, time_to_bet=form.time_to_bet.data)
+        import pdb;pdb.set_trace()
         db.session.add(event)
+        db.session.add(time_to_bet)
         db.session.commit()
         flash('Creation succeded!')
         return redirect(url_for('event'))
@@ -159,13 +161,10 @@ def create_event():
 @app.route('/event')
 @login_required
 def event():
-    c = sqlite3.connect('app.db')
-    cur = c.cursor()
-    cur.execute("SELECT * from Event")
-    test = cur.fetchall()
+    que = Event.query.all()
     eventlist = []
-    for ev in test:
-        eventlist.append({'id': ev[0], 'name': ev[1]})
+    for eve in que:
+        eventlist.append({'id': eve.id, 'name': eve.eventname})
     post = {'title': event, 'body': eventlist},
     return render_template('events/event.html', posts=post)
 
