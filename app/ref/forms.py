@@ -54,6 +54,16 @@ class EventBetForm(FlaskForm):
     amount = IntegerField('Amount')
     submit = SubmitField('Make Your Bet')
 
+class GetCoinForm(FlaskForm):
+
+    def __init__(self, original_username, *args, **kwargs):
+        super(GetCoinForm, self).__init__(*args, **kwargs)
+        self.original_username = original_username
+
+
+    amount = IntegerField('Amount')
+    submit = SubmitField('Give urself some money')
+
 class EditProfileForm(FlaskForm):
 
     def __init__(self, original_username, *args, **kwargs):

@@ -2,7 +2,7 @@ from flask import render_template, redirect, flash, url_for, request
 from app.ref import ref_bp 
 from flask_login import current_user, login_user, login_required, logout_user
 from app.models import User, Post, Event
-from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm
+from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, GetCoinForm
 from datetime import datetime
 from app import app, db
 
@@ -92,13 +92,24 @@ def edit_profile():
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
     return render_template('auth/edit_profile.html', title='Edit Profile', form=form)
-@app.route('/event/<eventname>/bet')
+
+@app.route('/event/<eventname>/bet', methods=['GET', 'POST'])
 @login_required
 def event_bet(eventname):
     form = EventBetForm(current_user.username)
     event = Event.query.filter_by(eventname=eventname).first_or_404()
+    user = User.query.filter_by(username=current_user.username).first_or_404()
     if form.validate_on_submit():
-        event = Event.query.filter_by(eventname=eventname).first_or_404()
+        if (current_user.coins>form.amount.data):
+            if event.amount:
+                event.amount = event.amount + form.amount.data
+            else:
+                event.amount = form.amount.data
+            current_user.coins = current_user.coins - form.amount.data
+        else:
+            return redirect(url_for('shop', username=current_user.username))
+        db.session.commit()
+        return redirect(url_for('user', username=current_user.username))
     posts = [
         {'title': event, 'body': ''},
     ]
@@ -158,7 +169,6 @@ def create_event():
     if form.validate_on_submit():
         event = Event(eventname=form.eventname.data, time_to_bet=form.time_to_bet.data)
         time_to_bet = form.time_to_bet.data
-        import pdb; pdb.set_trace()
         db.session.add(event)
         db.session.commit()
         flash('Creation succeded!')
@@ -188,19 +198,17 @@ def event_profile(eventname):
     ]
     return render_template('events/event_profile.html', event=event, posts=posts)
 
-
-#explore
-@app.route('/search')
+@app.route('/shop', methods=['Get', 'Post'])
 @login_required
-def search():
-    page = request.args.get('page', 1, type=int)
-    posts = Post.query.order_by(Post.timestamp.desc()).paginate(page, app.config['POSTS_PER_PAGE'], False)
-    next_url = url_for('search', page=posts.next_num) \
-        if posts.has_next else None
-    prev_url = url_for('search', page=posts.prev_num) \
-        if posts.has_prev else None
-    return render_template("index.html", title='Search', posts=posts.items,
-                          next_url=next_url, prev_url=prev_url)
+def shop():
+    form = GetCoinForm(current_user.username)
+    user = User.query.filter_by(username=current_user.username).first_or_404()
+    if form.validate_on_submit():
+        user.coins = user.coins + form.amount.data
+        db.session.commit()
+        return redirect(url_for('user', username=current_user.username))
+    return render_template("payment/shop.html", title='Shop', form=form)
+
 
 @app.before_request
 def before_request():
