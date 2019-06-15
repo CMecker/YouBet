@@ -17,23 +17,11 @@ def index():
         db.session.commit()
         flash('Your post is now live!')
         return redirect(url_for('index'))
-    posts = [
-        {
-            'author': {'username': 'Bran'},
-            'body': 'Best game eva!'
-        },
-        {
-            'author': {'username': 'test'},
-            'body': 'chat some!'
-        }
-    ]
     page = request.args.get('page', 1, type=int)
     posts = current_user.followed_posts().paginate(
         page, app.config['POSTS_PER_PAGE'], False)
-    next_url = url_for('index', page=posts.next_num) \
-        if posts.has_next else None
-    prev_url = url_for('index', page=posts.prev_num) \
-        if posts.has_prev else None
+    next_url = url_for('index', page=posts.next_num)if posts.has_next else None
+    prev_url = url_for('index', page=posts.prev_num)if posts.has_prev else None
     return render_template('index.html', title='Home', form=form, posts=posts.items, next_url=next_url, prev_url=prev_url)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -167,8 +155,12 @@ def set_coins(username):
 def create_event():
     form = EventRegistrationForm()
     if form.validate_on_submit():
-        event = Event(eventname=form.eventname.data, time_to_bet=form.time_to_bet.data)
-        time_to_bet = form.time_to_bet.data
+        event = Event(
+                eventname=form.eventname.data,
+                time_to_bet=form.time_to_bet.data,
+                )
+        challenger = User.query.filter_by(username=form.challenger.data).first_or_404()
+        event.add_challenger(challenger)
         db.session.add(event)
         db.session.commit()
         flash('Creation succeded!')
@@ -181,11 +173,20 @@ def event():
     que = Event.query.all()
     eventlist = []
     for eve in que:
+        challengerlist = []
+        for dudes in eve.challengers:
+            challengerlist.append(dudes.username)
         if not eve.amount:
             eve.amount=0
         if not eve.betting_quote:
             eve.betting_quote='(0,5/0,5)'
-        eventlist.append({'id': eve.id, 'name': eve.eventname, 'time_to_bet': eve.time_to_bet, 'amount': eve.amount, 'betting_quote': eve.betting_quote})
+        eventlist.append({
+            'id': eve.id,
+            'name': eve.eventname,
+            'time_to_bet': eve.time_to_bet,
+            'amount': eve.amount,
+            'challenger': challengerlist 
+            })
     post = {'title': event, 'body': eventlist},
     return render_template('events/event.html', posts=post)
 
