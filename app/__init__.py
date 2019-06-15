@@ -40,3 +40,5 @@ from app.errors import err_bp
 
 app.register_blueprint(err_bp)
 app.register_blueprint(ref_bp)
+
+db.create_all()

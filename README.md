@@ -27,6 +27,15 @@ pip install virtualenv
 virtualenv venv  
 . venv/Scripts/activate (under Windows to activate virtual Env)  
 
+### install MySQL
+
+* xampp (https://www.apachefriends.org/de/download.html) oder MySQL (https://dev.mysql.com/downloads/installer/) herunterladen und installieren
+* Bei Xampp im Control Panel Apache, MySQL starten --> Zugriff ueber http://localhost/phpmyadmin/
+* Bei der direkten Installation: pfad/bin den Systemvariablen hinzufügen
+* Start + Zugriff des Servers über mysql -u 'user' -p 'password'
+* Zum vereinfachten Zugriff auf die DB, kann HeidiSQL helfen (https://www.heidisql.com/download.php)
+* OPTIONAL: C:\...\YouBet\venv\Lib\site-packages\flask_sqlalchemy\__init__.py --> z.829 auf 'False' statt 'None' setzen, um eine Warnung beim Serverstart zu deaktivieren
+
 ### Run Flask
 
 pip install -r requirements.txt  
