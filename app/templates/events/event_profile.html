@@ -2,6 +2,15 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-	<h1>Event: {{ event.eventname }}</h1>
-	<hr>
+	<table>
+		<tr valign="top">
+            <td><h1>Event: {{ event.eventname }}</h1></td>
+		</tr>
+	</table>
+    <div>
+        {% if event.time_to_bet %}<p>BetEnding: {{ event.time_to_bet }}</p>{% endif %}
+        {% if event.amount%}<p>Total Bets: {{ event.amount }}</p>{% endif %}
+:       <br>
+        <p><a href="{{ url_for('event_bet', eventname=event.eventname) }}">Bet</a></p>
+    </div>
 {% endblock %}

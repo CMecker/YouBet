@@ -24,8 +24,11 @@
             <tbody>
                 {% for ev in post.body %}
                     <tr>
-                        <th scope="row"> {{ ev['id'] }} </th>
-                        <td> <a href="{{ url_for('event_profile', eventname=ev['name']) }}">{{ ev['name'] }}</a></td>
+                        <td scope="row"> {{ ev['id'] }} </th>
+                        <td scope="row"> <a href="{{ url_for('event_profile', eventname=ev['name']) }}">{{ ev['name'] }}</a></td>
+                        <td scope="row"> {{ ev['time_to_bet'] }} </th>
+                        <td scope="row"> {{ ev['amount'] }} </th>
+                        <td scope="row"> {{ ev['betting_quote'] }} </th>
                     </tr>
                 {% endfor %}
             </tbody>

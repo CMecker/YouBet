@@ -8,7 +8,7 @@
 			<td><h1>User: {{ user.username }}</h1></td>
 		</tr>
 	</table>
-	<h1>User: {{ user.username }}</h1>
+    <br>
     <div>
         {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
         {% if user.last_seen %}<p>Last seen on: {{moment(user.last_seen).fromNow() }}</p>{% endif %}
@@ -21,7 +21,7 @@
         {% else %}
         <p><a href="{{ url_for('unfollow', username=user.username) }}">Unfollow</a></p>
         {% endif %}
-        <hr>
+        <br>
         <p><a href="{{ url_for('set_coins', username=user.username) }}">ResetBank</a></p>
     </div>
 {% endblock %}
