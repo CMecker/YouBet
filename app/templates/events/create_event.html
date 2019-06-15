@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <h1>Create Event:</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.eventname.label }}<br>
+            {{ form.eventname(size=32) }}<br>
+            {{ form.time_to_bet.label }}<br>
+            {{ form.time_to_bet(size=32) }}<br>
+            {% for error in form.eventname.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}
+
