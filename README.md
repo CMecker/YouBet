@@ -29,19 +29,15 @@ virtualenv venv
 
 ### install MySQL
 
-* xampp (https://www.apachefriends.org/de/download.html) oder MySQL (https://dev.mysql.com/downloads/installer/) herunterladen und installieren
+* xampp (https://www.apachefriends.org/de/download.html)
 * Bei Xampp im Control Panel Apache, MySQL starten --> Zugriff ueber http://localhost/phpmyadmin/
-* Bei der direkten Installation: pfad/bin den Systemvariablen hinzufügen
-* Start + Zugriff des Servers über mysql -u 'user' -p 'password'
-* Zum vereinfachten Zugriff auf die DB, kann HeidiSQL helfen (https://www.heidisql.com/download.php)
-* OPTIONAL: C:\...\YouBet\venv\Lib\site-packages\flask_sqlalchemy\__init__.py --> z.829 auf 'False' statt 'None' setzen, um eine Warnung beim Serverstart zu deaktivieren
+flask db migrate -m "Changed db"(if changes made)  
+flask db upgrade  
 
 ### Run Flask
 
 pip install -r requirements.txt  
 export FLASK_APP=main.py  
-flask db upgrade  
-flask db migrate -m "Changed db"(if changes made)  
 flask run  
 --> open in Browser localhost:5000  
 --> user: test  
