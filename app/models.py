@@ -9,6 +9,14 @@ followers = db.Table('followers',
         db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
 )
 
+bet = db.Table('bet',
+        db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+        db.Column('event_id', db.Integer, db.ForeignKey('event.id')),
+        db.Column('amount', db.Integer),
+        db.Column('timestamp', db.DateTime, index=True, default=datetime.utcnow)
+)
+
+
 #NEEDING Delete Option
 class User(UserMixin, db.Model):
 
