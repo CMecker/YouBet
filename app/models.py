@@ -80,7 +80,6 @@ class Event(db.Model):
         return '<Event {}>'.format(self.eventname)
 
     def add_challenger(self, user):
-        import pdb;pdb.set_trace()
         self.challengers.append(user)
 
     id = db.Column(db.Integer, primary_key=True)
