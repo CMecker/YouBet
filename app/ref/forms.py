@@ -34,8 +34,15 @@ class EventRegistrationForm(FlaskForm):
         if event is not None:
             raise ValidationError('Unvalid eventname.')
 
+    def validate_challenger(self, username):
+        user=User.query.filter_by(username=username.data).first()
+        if user is None:
+            raise ValidationError('Unvalid username.')
+
+
     eventname = StringField('Eventname', validators=[DataRequired()])
     time_to_bet = DateField('TimeToBet', format='%Y-%m-%d', validators=[DataRequired()])
+    challenger = StringField('Challenger', validators=[DataRequired()])
     about_event = TextAreaField('Desricption', validators=[Length(min=0, max=140)])
     submit = SubmitField('Create')
 
