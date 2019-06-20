@@ -17,9 +17,16 @@ bet = db.Table('bet',
 )
 
 
+challengers = db.Table('challengers',
+        db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
+        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
+
 #NEEDING Delete Option
 class User(UserMixin, db.Model):
 
+    __tablename__ = 'user'
+    
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
@@ -71,11 +78,18 @@ class User(UserMixin, db.Model):
         secondaryjoin=(followers.c.followed_id == id),
         backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
+
 #NEEDING Delete Option
 class Event(db.Model):
 
+    __tablename__ = 'event'
+
     def __repr__(self):
         return '<Event {}>'.format(self.eventname)
+
+    def add_challenger(self, user):
+        import pdb;pdb.set_trace()
+        self.challengers.append(user)
 
     id = db.Column(db.Integer, primary_key=True)
     eventname = db.Column(db.String(64), index=True, unique=True)
@@ -84,7 +98,13 @@ class Event(db.Model):
     betting_quote = db.Column(db.String(30))
     posts = db.relationship('Post', backref='title')
 
+    challengers = db.relationship(
+        'User', secondary=challengers, lazy='subquery',
+        backref=db.backref('users', lazy=True))
+
 class Post(db.Model):
+
+    __tablename__ = 'post'
 
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.String(140))
@@ -95,14 +115,6 @@ class Post(db.Model):
     def __repr__(self):
         return '<Post {}>'.format(self.body)
     
-
-#needs table for single event
-#events = db.Table('events',
-#        db.Column('better_id', db.Integer, db.ForeignKey('user.id')),
-#        db.Column('player_id', db.Integer, db.ForeignKey('user.id'))
-#)
-
-
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
