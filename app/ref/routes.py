@@ -1,7 +1,7 @@
 from flask import render_template, redirect, flash, url_for, request
 from app.ref import ref_bp 
 from flask_login import current_user, login_user, login_required, logout_user
-from app.models import User, Post, Event
+from app.models import User, Post, Event, Bet
 from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, GetCoinForm
 from datetime import datetime
 from app import app, db
@@ -94,9 +94,11 @@ def event_bet(eventname):
             else:
                 event.amount = form.amount.data
             current_user.coins = current_user.coins - form.amount.data
+            its_a_bet = Bet(better=current_user, betted_on=event, amount=form.amount.data)
+            db.session.add(its_a_bet)
+            db.session.commit()
         else:
             return redirect(url_for('shop', username=current_user.username))
-        db.session.commit()
         return redirect(url_for('user', username=current_user.username))
     posts = [
         {'title': event, 'body': ''},
@@ -166,6 +168,29 @@ def create_event():
         flash('Creation succeded!')
         return redirect(url_for('event'))
     return render_template('events/create_event.html', title='CreateEvent', form=form)
+
+@app.route('/event/validate_event', methods=['GET', 'POST'])
+@login_required
+def validate_event():
+    user = User.query.filter_by(username=current_user.username).first_or_404()
+    event = Event.query.all()
+    bets = Bet.query.all()
+    if current_user.username != 'admin':
+        flash('You are no Admin.')
+        return redirect(url_for('event'))
+    else:
+	for one_event in event:
+		diff = one_event.time_to_bet - datetime.utcnow()
+		if diff.days<0:
+	        	val_ev = Event.query.filter_by(eventname=one_event.eventname).all()
+			for od_ev in val_ev:
+				for bettings in od_ev.bets:
+					winuser = User.query.filter_by(id=bettings.user_id).first_or_404()
+					winuser.coins = winuser.coins + bettings.amount*2 
+					db.session.commit()
+				db.session.delete(od_ev)
+				db.session.commit()
+    return redirect(url_for('event'))
 
 @app.route('/event')
 @login_required

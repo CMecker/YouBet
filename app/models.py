@@ -9,12 +9,6 @@ followers = db.Table('followers',
         db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
 )
 
-bet = db.Table('bet',
-        db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-        db.Column('event_id', db.Integer, db.ForeignKey('event.id')),
-        db.Column('amount', db.Integer),
-        db.Column('timestamp', db.DateTime, index=True, default=datetime.utcnow)
-)
 
 
 challengers = db.Table('challengers',
@@ -68,6 +62,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+    bets = db.relationship('Bet', backref='better', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     coins = db.Column(db.Integer, default=10)
@@ -88,7 +83,6 @@ class Event(db.Model):
         return '<Event {}>'.format(self.eventname)
 
     def add_challenger(self, user):
-        import pdb;pdb.set_trace()
         self.challengers.append(user)
 
     id = db.Column(db.Integer, primary_key=True)
@@ -97,6 +91,7 @@ class Event(db.Model):
     amount = db.Column(db.Integer)
     betting_quote = db.Column(db.String(30))
     posts = db.relationship('Post', backref='title')
+    bets = db.relationship('Bet', backref='betted_on')
 
     challengers = db.relationship(
         'User', secondary=challengers, lazy='subquery',
@@ -114,6 +109,20 @@ class Post(db.Model):
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
+
+class Bet(db.Model):
+
+    __tablename__ = 'bet'
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, index=True,default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
+    amount = db.Column(db.Integer)
+
+    def __repr__(self):
+        return '<Amount {}>'.format(self.amount)
+
     
 @login.user_loader
 def load_user(id):
