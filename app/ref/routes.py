@@ -94,8 +94,8 @@ def event_bet(eventname):
             else:
                 event.amount = form.amount.data
             current_user.coins = current_user.coins - form.amount.data
-            bet = Bet(better=current_user, betted_on=event, amount=form.amount.data)
-            db.session.add(bet)
+            its_a_bet = Bet(better=current_user, betted_on=event, amount=form.amount.data)
+            db.session.add(its_a_bet)
             db.session.commit()
         else:
             return redirect(url_for('shop', username=current_user.username))
@@ -173,11 +173,24 @@ def create_event():
 @login_required
 def validate_event():
     user = User.query.filter_by(username=current_user.username).first_or_404()
+    event = Event.query.all()
     bets = Bet.query.all()
-    for one_bet in bets:
-        diff = one_bet.timestamp - datetime.utcnow()
-        import pdb;pdb.set_trace()
-   
+    if current_user.username != 'admin':
+        flash('You are no Admin.')
+        return redirect(url_for('event'))
+    else:
+	for one_event in event:
+		diff = one_event.time_to_bet - datetime.utcnow()
+		if diff.days<0:
+	        	val_ev = Event.query.filter_by(eventname=one_event.eventname).all()
+			for od_ev in val_ev:
+				for bettings in od_ev.bets:
+					winuser = User.query.filter_by(id=bettings.user_id).first_or_404()
+					winuser.coins = winuser.coins + bettings.amount*2 
+					db.session.commit()
+				db.session.delete(od_ev)
+				db.session.commit()
+    return redirect(url_for('event'))
 
 @app.route('/event')
 @login_required
