@@ -7,3 +7,6 @@ logs/
 migrations/
 venv/
 db_config.py
+ez_setup.py
+get-pip.py
+setuptools-33.1.1.zip
