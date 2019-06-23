@@ -96,9 +96,7 @@ def event_bet(eventname):
 		    else:
 			event.amount = form.amount.data
 		    current_user.coins = current_user.coins - form.amount.data
-		    import pdb; pdb.set_trace()
 		    its_a_bet = Bet(better=current_user, betted_on=event, amount=form.amount.data, betonloose=form.betonloose.data)
-		    its_a_bet.bet(form.username.data)
 		    db.session.add(its_a_bet)
 		    db.session.commit()
 		else:
