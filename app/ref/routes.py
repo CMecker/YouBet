@@ -222,23 +222,23 @@ def event():
     que = Event.query.all()
     eventlist = []
     if que:
-		for eve in que:
-			challengerlist = []
-			for dudes in eve.challengers:
-				challengerlist.append(dudes.username)
-			if not eve.amount:
-				eve.amount = 0
-			if not eve.betting_quote:
-				eve.betting_quote = '(0,5/0,5)'
-			eventlist.append({
-				'id': eve.id,
-				'name': eve.eventname,
-				'time_to_bet': eve.time_to_bet,
-				'amount': eve.amount,
-				'challenger': challengerlist
-			})
-		post = {'title': event, 'body': eventlist},
-		return render_template('events/event.html', posts=post)
+        for eve in que:
+            challengerlist = []
+            for dudes in eve.challengers:
+                challengerlist.append(dudes.username)
+            if not eve.amount:
+                eve.amount = 0
+            if not eve.betting_quote:
+                eve.betting_quote = '(0,5/0,5)'
+            eventlist.append({
+                'id': eve.id,
+                'name': eve.eventname,
+                'time_to_bet': eve.time_to_bet,
+                'amount': eve.amount,
+                'challenger': challengerlist
+            })
+        post = {'title': event, 'body': eventlist},
+        return render_template('events/event.html', posts=post)
     else:
         return redirect(url_for('create_event'))
 
