@@ -89,7 +89,6 @@ def event_bet(eventname):
     user = User.query.filter_by(username=current_user.username).first_or_404()
     if form.validate_on_submit():
 	diff = event.time_to_bet - datetime.utcnow()
-	import pdb;pdb.set_trace()
 	if diff.days>0:
 		if (current_user.coins>form.amount.data):
 		    if event.amount:
@@ -168,7 +167,13 @@ def create_event():
                 time_to_bet=form.time_to_bet.data,
                 )
         challenger = User.query.filter_by(username=form.challenger.data).first_or_404()
+        more_challenger = User.query.filter_by(username=form.more_challenger.data).first_or_404()
+#	all_challenger=[]
+#	all_challenger.append(challenger)
+#	all_challenger.append(more_challenger)
+	import pdb;pdb.set_trace()
         event.add_challenger(challenger)
+        event.add_challenger(more_challenger)
         db.session.add(event)
         db.session.commit()
         flash('Creation succeded!')
