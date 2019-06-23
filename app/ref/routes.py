@@ -1,10 +1,12 @@
 from flask import render_template, redirect, flash, url_for, request
-from app.ref import ref_bp 
+from app.ref import ref_bp
 from flask_login import current_user, login_user, login_required, logout_user
 from app.models import User, Post, Event, Bet
-from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, GetCoinForm
+from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, \
+    GetCoinForm
 from datetime import datetime
 from app import app, db
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -20,9 +22,11 @@ def index():
     page = request.args.get('page', 1, type=int)
     posts = current_user.followed_posts().paginate(
         page, app.config['POSTS_PER_PAGE'], False)
-    next_url = url_for('index', page=posts.next_num)if posts.has_next else None
-    prev_url = url_for('index', page=posts.prev_num)if posts.has_prev else None
-    return render_template('index.html', title='Home', form=form, posts=posts.items, next_url=next_url, prev_url=prev_url)
+    next_url = url_for('index', page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('index', page=posts.prev_num) if posts.has_prev else None
+    return render_template('index.html', title='Home', form=form, posts=posts.items, next_url=next_url,
+                           prev_url=prev_url)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -38,10 +42,12 @@ def login():
         return redirect(url_for('index'))
     return render_template('auth/login.html', title='Sign In', form=form)
 
+
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -57,6 +63,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('auth/register.html', title='Register', form=form)
 
+
 @app.route('/user/<username>')
 @login_required
 def user(username):
@@ -65,6 +72,7 @@ def user(username):
         {'author': user, 'body': ''},
     ]
     return render_template('auth/user.html', user=user, posts=posts)
+
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -81,6 +89,7 @@ def edit_profile():
         form.about_me.data = current_user.about_me
     return render_template('auth/edit_profile.html', title='Edit Profile', form=form)
 
+
 @app.route('/event/<eventname>/bet', methods=['GET', 'POST'])
 @login_required
 def event_bet(eventname):
@@ -88,7 +97,7 @@ def event_bet(eventname):
     event = Event.query.filter_by(eventname=eventname).first_or_404()
     user = User.query.filter_by(username=current_user.username).first_or_404()
     if form.validate_on_submit():
-        if (current_user.coins>form.amount.data):
+        if (current_user.coins > form.amount.data):
             if event.amount:
                 event.amount = event.amount + form.amount.data
             else:
@@ -105,6 +114,7 @@ def event_bet(eventname):
     ]
     return render_template('events/event_bet.html', title='Bet Event', form=form)
 
+
 @app.route('/follow/<username>')
 @login_required
 def follow(username):
@@ -120,6 +130,7 @@ def follow(username):
     flash('You are following {}!'.format(username))
     return redirect(url_for('user', username=username))
 
+
 @app.route('/unfollow/<username>')
 @login_required
 def unfollow(username):
@@ -134,6 +145,7 @@ def unfollow(username):
     db.session.commit()
     flash('You are not following {}.'.format(username))
     return redirect(url_for('user', username=username))
+
 
 @app.route('/set_coins/<username>')
 @login_required
@@ -158,9 +170,9 @@ def create_event():
     form = EventRegistrationForm()
     if form.validate_on_submit():
         event = Event(
-                eventname=form.eventname.data,
-                time_to_bet=form.time_to_bet.data,
-                )
+            eventname=form.eventname.data,
+            time_to_bet=form.time_to_bet.data,
+        )
         challenger = User.query.filter_by(username=form.challenger.data).first_or_404()
         event.add_challenger(challenger)
         db.session.add(event)
@@ -168,6 +180,7 @@ def create_event():
         flash('Creation succeded!')
         return redirect(url_for('event'))
     return render_template('events/create_event.html', title='CreateEvent', form=form)
+
 
 @app.route('/event/validate_event', methods=['GET', 'POST'])
 @login_required
@@ -179,18 +192,19 @@ def validate_event():
         flash('You are no Admin.')
         return redirect(url_for('event'))
     else:
-	for one_event in event:
-		diff = one_event.time_to_bet - datetime.utcnow()
-		if diff.days<0:
-	        	val_ev = Event.query.filter_by(eventname=one_event.eventname).all()
-			for od_ev in val_ev:
-				for bettings in od_ev.bets:
-					winuser = User.query.filter_by(id=bettings.user_id).first_or_404()
-					winuser.coins = winuser.coins + bettings.amount*2 
-					db.session.commit()
-				db.session.delete(od_ev)
-				db.session.commit()
+        for one_event in event:
+            diff = one_event.time_to_bet - datetime.utcnow()
+            if diff.days < 0:
+                val_ev = Event.query.filter_by(eventname=one_event.eventname).all()
+                for od_ev in val_ev:
+                    for bettings in od_ev.bets:
+                        winuser = User.query.filter_by(id=bettings.user_id).first_or_404()
+                        winuser.coins = winuser.coins + bettings.amount * 2
+                        db.session.commit()
+                    db.session.delete(od_ev)
+                    db.session.commit()
     return redirect(url_for('event'))
+
 
 @app.route('/event')
 @login_required
@@ -202,18 +216,19 @@ def event():
         for dudes in eve.challengers:
             challengerlist.append(dudes.username)
         if not eve.amount:
-            eve.amount=0
+            eve.amount = 0
         if not eve.betting_quote:
-            eve.betting_quote='(0,5/0,5)'
+            eve.betting_quote = '(0,5/0,5)'
         eventlist.append({
             'id': eve.id,
             'name': eve.eventname,
             'time_to_bet': eve.time_to_bet,
             'amount': eve.amount,
-            'challenger': challengerlist 
-            })
+            'challenger': challengerlist
+        })
     post = {'title': event, 'body': eventlist},
     return render_template('events/event.html', posts=post)
+
 
 @app.route('/event/<eventname>')
 @login_required
@@ -223,6 +238,7 @@ def event_profile(eventname):
         {'title': event, 'body': ''},
     ]
     return render_template('events/event_profile.html', event=event, posts=posts)
+
 
 @app.route('/shop', methods=['Get', 'Post'])
 @login_required
@@ -245,6 +261,4 @@ def before_request():
 
 @app.route('/hello')
 def hello_world():
-	return 'Hello, World!'
-
-
+    return 'Hello, World!'
