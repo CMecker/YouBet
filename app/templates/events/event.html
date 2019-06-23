@@ -33,9 +33,7 @@
                         <td scope="row"> <a href="{{ url_for('event_profile', eventname=ev['name']) }}">{{ ev['name'] }}</a></td>
                         <td scope="row"> {{ ev['time_to_bet'] }} </td>
                         <td scope="row"> {{ ev['amount'] }} </td>
-                        {% for dudes in ev['challenger'] %}
-                            <td scope="row"> <a href="{{ url_for('user', username=dudes ) }}">{{ dudes }}</a></td>
-                        {% endfor %}
+			<td scope="row"> {% for dudes in ev['challenger'] %}<a href="{{ url_for('user', username=dudes ) }}">{{ dudes }}, </a>{% endfor %}</td>
                     </tr>
                 {% endfor %}
             </tbody>
