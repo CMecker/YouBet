@@ -97,22 +97,23 @@ def event_bet(eventname):
     event = Event.query.filter_by(eventname=eventname).first_or_404()
     user = User.query.filter_by(username=current_user.username).first_or_404()
     if form.validate_on_submit():
-		diff = event.time_to_bet - datetime.utcnow()
-		if diff.days>0:
-			if (current_user.coins>form.amount.data):
-				if event.amount:
-				event.amount = event.amount + form.amount.data
-				else:
-				event.amount = form.amount.data
-				current_user.coins = current_user.coins - form.amount.data
-				db.session.add(its_a_bet)
-				db.session.commit()
-			else:
-				return redirect(url_for('shop', username=current_user.username))
-			return redirect(url_for('user', username=current_user.username))
-	else:
-		flash('Event {} already ended.'.format(eventname))
-		return redirect(url_for('event'))
+        diff = event.time_to_bet - datetime.utcnow()
+        if diff.days>0:
+            if (current_user.coins>form.amount.data):
+                if event.amount:
+                    event.amount = event.amount + form.amount.data
+                else:
+                    event.amount = form.amount.data
+                current_user.coins = current_user.coins - form.amount.data
+                its_a_bet = Bet(better=current_user, betted_on=event, amount=form.amount.data)
+                db.session.add(its_a_bet)
+                db.session.commit()
+                return redirect(url_for('event'))
+            else:
+                return redirect(url_for('shop', username=current_user.username))
+        else:
+            flash('Event {} already ended.'.format(eventname))
+            return redirect(url_for('event'))
     posts = [
         {'title': event, 'body': ''},
     ]
