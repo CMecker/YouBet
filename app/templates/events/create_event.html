@@ -12,6 +12,8 @@
             {{ form.time_to_bet(size=32) }}<br>
             {{ form.challenger.label }}<br>
             {{ form.challenger(size=32) }}<br>
+            {{ form.more_challenger.label }}<br>
+            {{ form.more_challenger(size=32) }}<br>
             {% for error in form.eventname.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}

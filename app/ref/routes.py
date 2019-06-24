@@ -74,6 +74,7 @@ def user(username):
     return render_template('auth/user.html', title='Profile', user=user, posts=posts)
 
 
+
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
@@ -97,18 +98,23 @@ def event_bet(eventname):
     event = Event.query.filter_by(eventname=eventname).first_or_404()
     user = User.query.filter_by(username=current_user.username).first_or_404()
     if form.validate_on_submit():
-        if (current_user.coins > form.amount.data):
-            if event.amount:
-                event.amount = event.amount + form.amount.data
+        diff = event.time_to_bet - datetime.utcnow()
+        if diff.days>0:
+            if (current_user.coins>form.amount.data):
+                if event.amount:
+                    event.amount = event.amount + form.amount.data
+                else:
+                    event.amount = form.amount.data
+                current_user.coins = current_user.coins - form.amount.data
+                its_a_bet = Bet(better=current_user, betted_on=event, amount=form.amount.data)
+                db.session.add(its_a_bet)
+                db.session.commit()
+                return redirect(url_for('event'))
             else:
-                event.amount = form.amount.data
-            current_user.coins = current_user.coins - form.amount.data
-            its_a_bet = Bet(better=current_user, betted_on=event, amount=form.amount.data)
-            db.session.add(its_a_bet)
-            db.session.commit()
+                return redirect(url_for('shop', username=current_user.username))
         else:
-            return redirect(url_for('shop', username=current_user.username))
-        return redirect(url_for('user', username=current_user.username))
+            flash('Event {} already ended.'.format(eventname))
+            return redirect(url_for('event'))
     posts = [
         {'title': event, 'body': ''},
     ]
@@ -174,7 +180,12 @@ def create_event():
             time_to_bet=form.time_to_bet.data,
         )
         challenger = User.query.filter_by(username=form.challenger.data).first_or_404()
+        more_challenger = User.query.filter_by(username=form.more_challenger.data).first_or_404()
+#	all_challenger=[]
+#	all_challenger.append(challenger)
+#	all_challenger.append(more_challenger)
         event.add_challenger(challenger)
+        event.add_challenger(more_challenger)
         db.session.add(event)
         db.session.commit()
         flash('Creation succeded!')
@@ -211,23 +222,26 @@ def validate_event():
 def event():
     que = Event.query.all()
     eventlist = []
-    for eve in que:
-        challengerlist = []
-        for dudes in eve.challengers:
-            challengerlist.append(dudes.username)
-        if not eve.amount:
-            eve.amount = 0
-        if not eve.betting_quote:
-            eve.betting_quote = '(0,5/0,5)'
-        eventlist.append({
-            'id': eve.id,
-            'name': eve.eventname,
-            'time_to_bet': eve.time_to_bet,
-            'amount': eve.amount,
-            'challenger': challengerlist
-        })
-    post = {'title': event, 'body': eventlist},
-    return render_template('events/event.html', posts=post)
+    if que:
+        for eve in que:
+            challengerlist = []
+            for dudes in eve.challengers:
+                challengerlist.append(dudes.username)
+            if not eve.amount:
+                eve.amount = 0
+            if not eve.betting_quote:
+                eve.betting_quote = '(0,5/0,5)'
+            eventlist.append({
+                'id': eve.id,
+                'name': eve.eventname,
+                'time_to_bet': eve.time_to_bet,
+                'amount': eve.amount,
+                'challenger': challengerlist
+            })
+        post = {'title': event, 'body': eventlist},
+        return render_template('events/event.html', posts=post)
+    else:
+        return redirect(url_for('create_event'))
 
 
 @app.route('/event/<eventname>')
@@ -259,6 +273,3 @@ def before_request():
         db.session.commit()
 
 
-@app.route('/hello')
-def hello_world():
-    return 'Hello, World!'
