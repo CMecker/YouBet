@@ -9,6 +9,7 @@ followers = db.Table('followers',
         db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
 )
 
+
 challengers = db.Table('challengers',
         db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
         db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
