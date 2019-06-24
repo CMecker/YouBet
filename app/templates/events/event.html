@@ -2,11 +2,14 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-    <h1>Let's see what we got for you: </h1>
+    <h3>Let's see what we got for you: </h3>
     <hr>
     <div class="btn-group" role="group" aria-label="EventTasks">
         <button type="button" class="btn btn-secondary">
             <a href="{{ url_for('create_event') }}">Create</a>
+        </button>
+        <button type="button" class="btn btn-secondary">
+            <a href="{{ url_for('validate_event') }}">Validate</a>
         </button>
     </div>
     {% for post in posts %}

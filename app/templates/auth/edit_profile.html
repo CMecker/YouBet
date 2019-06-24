@@ -2,23 +2,34 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-    <h1>Edit Profile</h1>
+    <h3>Edit Profile</h3>
     <form action="" method="post">
         {{ form.hidden_tag() }}
+
         <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}<br>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input class="mdl-textfield__input" size="32" type="text" value="{{form.username.data}}" id="username" name="username">
+                <label class="mdl-textfield__label" for="username">Username...</label>
+            </div>
+
             {% for error in form.username.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>
-            {{ form.about_me.label }}<br>
-            {{ form.about_me(cols=50, rows=4) }}<br>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <textarea class="mdl-textfield__input" cols="50" rows="4" type="text" value="{{form.about_me.data}}" id="about_me" name="about_me">
+                </textarea>
+                <label class="mdl-textfield__label" for="about_me">About me...</label>
+            </div>
             {% for error in form.about_me.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
-        <p>{{ form.submit() }}</p>
+
+         <input class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" id="submit" name="submit"
+               type="submit" value="Save">
     </form>
+
+
 {% endblock %}
