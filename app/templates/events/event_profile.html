@@ -11,6 +11,11 @@
         {{event}}<hr>
         {% if event.time_to_bet %} BetEnding: {{ event.time_to_bet }} {% endif %}<hr>
         {% if event.amount%} Total Bets: {{ event.amount }} {% endif %}<hr>
+        {% if event.challengers%} Challengers: 
+            {% for dudes in event.challengers %}
+                <a href="{{ url_for('user', username=dudes.username)}}">{{ dudes.username }}; </a>
+            {% endfor %}
+        {% endif %}<hr>
         <button><a href="{{ url_for('event_bet', eventname=event.eventname) }}">Bet</a></button>
     </section>
 {% endblock %}
