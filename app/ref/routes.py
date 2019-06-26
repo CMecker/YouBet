@@ -180,12 +180,10 @@ def create_event():
             time_to_bet=form.time_to_bet.data,
         )
         challenger = User.query.filter_by(username=form.challenger.data).first_or_404()
-        more_challenger = User.query.filter_by(username=form.more_challenger.data).first_or_404()
-#	all_challenger=[]
-#	all_challenger.append(challenger)
-#	all_challenger.append(more_challenger)
         event.add_challenger(challenger)
-        event.add_challenger(more_challenger)
+        if form.more_challenger.data != '':
+            more_challenger = User.query.filter_by(username=form.more_challenger.data).first_or_404()
+            event.add_challenger(more_challenger)
         db.session.add(event)
         db.session.commit()
         flash('Creation succeded!')

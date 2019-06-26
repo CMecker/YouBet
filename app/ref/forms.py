@@ -40,9 +40,10 @@ class EventRegistrationForm(FlaskForm):
             raise ValidationError('Unvalid username.')
 
     def validate_more_challenger(self, username):
-        user=User.query.filter_by(username=username.data).first()
-        if user is None:
-            raise ValidationError('Unvalid username.')
+        if username.data != '':
+            user=User.query.filter_by(username=username.data).first()
+            if user is None:
+                raise ValidationError('Unvalid username.')
 
 
     eventname = StringField('Eventname', validators=[DataRequired()])
