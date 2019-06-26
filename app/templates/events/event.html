@@ -13,9 +13,7 @@
         </button>
     </div>
     {% for post in posts %}
-        <p>
-        Post Body: <b>{{ post.body }}</b>
-        </p>
+        <div>
         <table class="table">
             <thead>
                 <tr>
@@ -38,6 +36,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
     {% endfor %}
 {% endblock %}
 
