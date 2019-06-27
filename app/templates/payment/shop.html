@@ -2,25 +2,16 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-<h3>Not enough coins? Get it Now</h3>
-<form action="" method="post">
-    {{ form.hidden_tag() }}
-    <p>
-
-    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-        <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="amount" name="amount">
-        <label class="mdl-textfield__label" for="amount">Enter amount to deposit...</label>
-        <span class="mdl-textfield__error">Input is not a number!</span>
-    </div>
-
-
-    {% for error in form.amount.errors %}
-    <span style="color: red;">[{{ error }}]</span>
-    {% endfor %}
-    </p>
-    <p>
-        <input class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored"
-               id="submit" name="submit" type="submit" value="Deposit">
-    </p>
-</form>
+    <h1>Not enough coins? Get it Now</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.amount.label }}<br>
+            {{ form.amount(size=32) }}<br>
+            {% for error in form.amount.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
 {% endblock %}
