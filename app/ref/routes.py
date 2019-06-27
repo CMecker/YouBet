@@ -191,6 +191,14 @@ def create_event():
     return render_template('events/create_event.html', title='CreateEvent', form=form)
 
 
+@app.route('/add_challenger', methods=['POST'])
+def add_challenger():
+    i='challenger0'
+    import pdb;pdb.set_trace()
+    q1=request.forms[i]
+    return redirect(url_for('event'))
+
+
 @app.route('/event/validate_event', methods=['GET', 'POST'])
 @login_required
 def validate_event():
