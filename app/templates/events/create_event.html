@@ -37,17 +37,14 @@
             {{ form.eventname(size=32) }}<br>
             {{ form.time_to_bet.label }}<br>
             {{ form.time_to_bet(size=32) }}<br>
-            {{ form.challenger.label }}<br>
-            {{ form.challenger(size=32) }}<br>
-            {{ form.more_challenger.label }}<br>
-            {{ form.more_challenger(size=32) }}<br>
             {% for error in form.eventname.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </section>
         </section>
         <section>
-            <input type="text" id="countChallenger" name="challenger" value="">Number of challengers: (max. 10)<br>
+            {{ form.chll.label }}
+            <input type="text" id="countChallenger" name="challenger" value=""><br>
             <button><a href="#" id="addingChallengerForms" onclick="addFields()">Name Challenger(s)</a></button>
         </section>
         <section id="container"/>
