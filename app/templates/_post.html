@@ -1,20 +1,19 @@
-<li class="mdl-list__item">
-    <span class="mdl-list__item-primary-content">
-        <span class="mdl-list__item-primary-content">
-            <i class="mdl-list__item-icon">
-                <img src="{{ post.author.avatar(36) }}">
-            </i>
-            <div>
-                <div>
-                    <span><a href="{{ url_for('user', username=post.author.username) }}">{{ post.author.username }}</a></span>
-                    {% if post.timestamp %}
-                        <span>, posted {{moment(post.timestamp).fromNow() }}</span>
-                    {% endif %}
-                </div>
-                <div style="padding-top: 10px">
-                {{ post.body }}
-                </div>
-            </div>
-        </span>
-    </span>
-</li>
+<table class="table table-hover">
+	<tr valign="top">
+	<table>
+        	<tr valign="top">
+            		<td><img src="{{ post.author.avatar(36) }}"></td>
+			<td>
+				<a href="{{ url_for('user', username=post.author.username) }}">
+					{{ post.author.username }}
+				</a>
+                {% if post.timestamp %}
+                <p>posted {{moment(post.timestamp).fromNow() }}</p>
+                {% endif %}
+				<br>
+				{{ post.body }}
+			</td>
+        	</tr>
+	</table>
+	</tr>
+</table>

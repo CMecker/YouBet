@@ -2,23 +2,53 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
+    <script type="text/javascript">
+        function addChallengerForm() {
+            document.getElementById("moreChallengerSec").innerHTML = "Hello World";
+        }
+        function addFields(){
+            // Number of inputs to create
+            var number = document.getElementById("countChallenger").value;
+            // Container <div> where dynamic content will be placed
+            var container = document.getElementById("container");
+            // Clear previous contents of the container
+            while (container.hasChildNodes()) {
+                container.removeChild(container.lastChild);
+            }
+            for (i=0;i<number;i++){
+                // Append a node with a random text
+                container.appendChild(document.createTextNode("Challenger " + (i+1)));
+                // Create an <input> element, set its type and name attributes
+                var input = document.createElement("input");
+                input.type = "text";
+                input.name = "challenger" + i;
+                container.appendChild(input);
+                // Append a line break 
+                container.appendChild(document.createElement("br"));
+            }
+        }
+    </script>
     <h3>Create Event:</h3>
-    <form action="" method="post">
+    <form action="/add_challenger" method="POST">
         {{ form.hidden_tag() }}
-        <p>
+        <section>{{ form.submit() }}</section>
+        <section>
             {{ form.eventname.label }}<br>
             {{ form.eventname(size=32) }}<br>
             {{ form.time_to_bet.label }}<br>
             {{ form.time_to_bet(size=32) }}<br>
-            {{ form.challenger.label }}<br>
-            {{ form.challenger(size=32) }}<br>
-            {{ form.more_challenger.label }}<br>
-            {{ form.more_challenger(size=32) }}<br>
             {% for error in form.eventname.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
+        </section>
+        </section>
+        <section>
+            {{ form.chll.label }}
+            <input type="text" id="countChallenger" name="challenger" value=""><br>
+            <button><a href="#" id="addingChallengerForms" onclick="addFields()">Name Challenger(s)</a></button>
+        </section>
+        <section id="container"/>
+        <hr>
     </form>
 {% endblock %}
 

@@ -2,50 +2,29 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-<h3>Hi, {{ current_user.username }}!</h3>
-{% if form %}
+    <h3>Hi, {{ current_user.username }}!</h3>
+    {% if form %}
 
-    <div class="mdl-shadow--4dp mdl-card" style="padding: 5px 5px 5px 5px; float: right; min-height: 150px;">
-        <form action="" method="post">
-        <div style="width: 100%">
-            {{ form.hidden_tag() }}
-            <span class="mdl-textfield mdl-js-textfield" style="width: 100%">
-                <textarea class="mdl-textfield__input" type="text" rows="3" id="post" name="post"></textarea>
-                <label class="mdl-textfield__label" for="post">Describe your bet...</label>
-            </span>
-
-            {% for error in form.post.errors %}
-               <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-
-        </div>
-
-        <div style="float: right;">
-            <input class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" id="submit" name="submit"
-                   type="submit" value="Post">
-        </div>
-        </form>
-    </div>
-
-{% endif %}
-
-
-
-<div>
-    <ul class="bet-list-item mdl-list">
-    {% for post in posts %}
-    {% include '_post.html' %}
-    {% endfor %}
-    </ul>
-
-    {% if prev_url %}
-    <a href="{{ prev_url }}">Newer posts</a>
-    {% endif %}
-    {% if next_url %}
-    <a href="{{ next_url }}">Older posts</a>
-    {% endif %}
-
-</div>
-
+	<form action="" method="post">
+		{{ form.hidden_tag() }}
+		<p>
+			{{ form.post.label }}<br>
+			{{ form.post(cols=32, rows=4) }}<br>
+			{% for error in form.post.errors %}
+			<span style="color: red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>{{ form.submit() }}</p>
+	</form>
+	{% endif %}
+	{% for post in posts %}
+		{% include '_post.html' %}
+	{% endfor %}
+	{% if prev_url %}
+	<a href="{{ prev_url }}">Newer posts</a>
+	{% endif %}
+	{% if next_url %}
+	<a href="{{ next_url }}">Older posts</a>
+	{% endif %}
 
 {% endblock %}

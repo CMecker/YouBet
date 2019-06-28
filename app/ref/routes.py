@@ -174,21 +174,39 @@ def set_coins(username):
 @login_required
 def create_event():
     form = EventRegistrationForm()
-    if form.validate_on_submit():
-        event = Event(
-            eventname=form.eventname.data,
-            time_to_bet=form.time_to_bet.data,
-        )
-        challenger = User.query.filter_by(username=form.challenger.data).first_or_404()
-        event.add_challenger(challenger)
-        if form.more_challenger.data != '':
-            more_challenger = User.query.filter_by(username=form.more_challenger.data).first_or_404()
-            event.add_challenger(more_challenger)
-        db.session.add(event)
-        db.session.commit()
-        flash('Creation succeded!')
-        return redirect(url_for('event'))
+   # if form.validate_on_submit():
+   #     event = Event(
+   #         eventname=form.eventname.data,
+   #         time_to_bet=form.time_to_bet.data,
+   #     )
+   #     challengeri = User.query.filter_by(username=form.challenger.data).first_or_404()
+   #     event.add_challenger(challengeri)
+   #     if form.more_challenger.data != '':
+   #         more_challenger = User.query.filter_by(username=form.more_challenger.data).first_or_404()
+   #         event.add_challenger(more_challenger)
+   #     db.session.add(event)
+   #     db.session.commit()
+   #     flash('Creation succeded!')
+   #     return redirect(url_for('event'))
     return render_template('events/create_event.html', title='CreateEvent', form=form)
+
+
+@app.route('/add_challenger', methods=['POST'])
+def add_challenger():
+    challName='challenger0'
+    event = Event(
+        eventname=request.form['eventname'],
+        time_to_bet=request.form['time_to_bet'],
+    )
+    for num in range(0, int(request.form['challenger'])):
+        challDb = User.query.filter_by(username=request.form[challName]).first_or_404()
+        event.add_challenger(challDb)
+        challName=challName.replace(str(num), str(num+1))
+    db.session.add(event)
+    db.session.commit()
+    flash('Creation succeded!')
+        
+    return redirect(url_for('event'))
 
 
 @app.route('/event/validate_event', methods=['GET', 'POST'])
