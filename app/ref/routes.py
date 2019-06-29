@@ -285,7 +285,7 @@ def shop():
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
-        current_user.last_seen = datetime.utcnow()
+        current_user.last_seen = datetime.now()
         db.session.commit()
 
 

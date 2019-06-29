@@ -64,7 +64,7 @@ class User(UserMixin, db.Model):
     bets = db.relationship('Bet', backref='better', lazy='dynamic')
     challenges = db.relationship('Bet', backref='challenger', lazy='dynamic')
     about_me = db.Column(db.String(140))
-    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+    last_seen = db.Column(db.DateTime, default=datetime.now())
     coins = db.Column(db.Integer, default=10)
 
     followed = db.relationship(
