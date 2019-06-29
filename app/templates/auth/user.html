@@ -18,15 +18,15 @@
     <br>
     <div>
         {% if user == current_user %}
-        <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored"  href="{{ url_for('edit_profile') }}">Edit your profile</a>
+        <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored"  href="{{ url_for('edit_profile') }}">Edit your profile</a><br>
         {% elif not current_user.is_following(user) %}
-        <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('follow', username=user.username) }}">Follow</a>
+        <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('follow', username=user.username) }}">Follow</a><br>
         {% else %}
-        <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('unfollow', username=user.username) }}">Unfollow</a>
+        <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('unfollow', username=user.username) }}">Unfollow</a><br>
         {% endif %}
-        <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('set_coins', username=user.username) }}">ResetBank</a>
+        <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('set_coins', username=user.username) }}">ResetBank</a><br>
 
-        <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" class="mdl-navigation__link" href="{{ url_for('logout') }}">Logout</a>
+        <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" class="mdl-navigation__link" href="{{ url_for('logout') }}">Logout</a><br>
 
     </div>
 

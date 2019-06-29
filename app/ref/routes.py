@@ -281,11 +281,14 @@ def shop():
         return redirect(url_for('user', username=current_user.username))
     return render_template("payment/shop.html", title='Deposit', form=form)
 
+@app.route('/impressum/')
+def impressum():
+    return render_template('impressum.html')
 
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
-        current_user.last_seen = datetime.utcnow()
+        current_user.last_seen = datetime.now()
         db.session.commit()
 
 

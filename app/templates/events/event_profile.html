@@ -4,11 +4,11 @@
 {% block app_content %}
 	<header>
 		<tr valign="top">
-            <td><h3>Event: {{ event.eventname }}</h3></td>
+            <td><h3>Event: {{ event.eventname }}</h3></td><br>
 		</tr>
 	</header>
     <section>
-        {{event}}<hr>
+<!--        {{event}}<hr>-->
         {% if event.time_to_bet %} BetEnding: {{ event.time_to_bet }} {% endif %}<hr>
         {% if event.amount%} Total Bets: {{ event.amount }} {% endif %}<hr>
         {% if event.challengers%} Challengers: 
