@@ -1,0 +1,19 @@
+<table class="table table-hover">
+	<tr valign="top">
+	<table>
+        	<tr valign="top">
+            		<td><img src="{{ post.author.avatar(36) }}"></td>
+			<td>
+				<a href="{{ url_for('user', username=post.author.username) }}">
+					{{ post.author.username }}
+				</a>
+                {% if post.timestamp %}
+                <p>posted {{moment(post.timestamp).fromNow() }}</p>
+                {% endif %}
+				<br>
+				{{ post.body }}
+			</td>
+        	</tr>
+	</table>
+	</tr>
+</table>

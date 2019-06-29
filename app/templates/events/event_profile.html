@@ -18,4 +18,16 @@
         {% endif %}<hr>
         <button><a href="{{ url_for('event_bet', eventname=event.eventname) }}">Bet</a></button>
     </section>
+    <section>
+	{% for post in posts %}
+        <h1>{{ post.user_id }} Hallo</h1>
+		{% include '_post.html' %}
+	{% endfor %}
+	{% if prev_url %}
+	<a href="{{ prev_url }}">Newer posts</a>
+	{% endif %}
+	{% if next_url %}
+	<a href="{{ next_url }}">Older posts</a>
+	{% endif %}
+    </section>
 {% endblock %}

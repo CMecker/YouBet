@@ -1,4 +1,5 @@
-# YouBet - Webtechniken 2019
+# YouBet 
+## Projekt Webtechniken 2019
 In diesem Projekt k&ouml;nnen Mitglieder verschieden Events erstellen
 und auf diese Events wetten. Als W&auml;hrung dient ein internes Coin-
 System. Viel Spaß!
@@ -14,7 +15,7 @@ System. Viel Spaß!
 ##### Datenbank installieren
 
 3.1 Xampp herunterladen (https://www.apachefriends.org/de/download.html)
-3.2 Xampp mit Standardeinstellungen installieren  
+3.2 Xampp mit Standardeinstellungen installieren   
 3.3 Im Xampp Control-Panel Apache und MySQL starten  
 3.3 unter http://localhost/phpmyadmin/ eine neue DB erstellen  
 Name: **beliebig**  
