@@ -14,10 +14,10 @@ System. Viel Spaß!
 
 ##### Datenbank installieren
 
-3.1 Xampp herunterladen (https://www.apachefriends.org/de/download.html)
-3.2 Xampp mit Standardeinstellungen installieren   
+3.1 Xampp herunterladen (https://www.apachefriends.org/de/download.html)  
+3.2 Xampp mit Standardeinstellungen installieren  
 3.3 Im Xampp Control-Panel Apache und MySQL starten  
-3.3 unter http://localhost/phpmyadmin/ eine neue DB erstellen  
+3.4 unter http://localhost/phpmyadmin/ eine neue DB erstellen  
 Name: **beliebig**  
 Kollation: **utf8_general_ci**
 
