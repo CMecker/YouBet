@@ -19,6 +19,16 @@ winners = db.Table('winners',
         db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
 )
 
+#betwinner = db.Table('betwinner',
+#        db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
+#        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+#)
+#
+#userbets = db.Table('userbets',
+#        db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
+#        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+#)
+
 #NEEDING Delete Option
 class User(UserMixin, db.Model):
 
@@ -65,7 +75,6 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
-    bets = db.relationship('Bet', backref='better', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.now())
     coins = db.Column(db.Integer, default=10)
@@ -98,7 +107,6 @@ class Event(db.Model):
     winsetted = db.Column(db.Boolean)
     betting_quote = db.Column(db.String(30))
     posts = db.relationship('Post', backref='title')
-    bets = db.relationship('Bet', backref='betted_on')
 
     winners = db.relationship(
         'User', secondary=winners, lazy='subquery',
@@ -125,15 +133,28 @@ class Bet(db.Model):
 
     __tablename__ = 'bet'
 
-    id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, index=True,default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
-    betonloose = db.Column(db.Boolean)
-    amount = db.Column(db.Integer)
-
     def __repr__(self):
         return '<Amount {}>'.format(self.amount)
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, index=True,default=datetime.utcnow)
+    betonloose = db.Column(db.Boolean, default=False)
+    amount = db.Column(db.Integer)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    winner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    user = db.relationship('User', foreign_keys=[user_id])
+    winner = db.relationship('User', foreign_keys=[winner_id])
+    event = db.relationship('Event', foreign_keys=[event_id])
+
+#    userbets = db.relationship(
+#        'User', secondary=userbets, lazy='subquery',
+#        backref=db.backref('userbets', lazy=True))
+#
+#    betwinner = db.relationship(
+#        'User', secondary=betwinner, lazy='subquery',
+#        backref=db.backref('betwinner', lazy=True))
 
     
 @login.user_loader

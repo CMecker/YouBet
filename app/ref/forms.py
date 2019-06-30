@@ -58,13 +58,8 @@ class EventBetForm(FlaskForm):
         super(EventBetForm, self).__init__(*args, **kwargs)
         self.original_username = original_username
 
-    def validate_username(self, username):
-        if username.data != self.original_username:
-            user = User.query.filter_by(username=self.username.data).first()
-            if user is not None:
-                raise ValidationError('Unvalid username.')
-    
-    username = StringField('Challenger')
+    username = StringField('User')
+    betwinner = StringField('Challenger')
     betonloose = BooleanField('Bet on Loose')
     amount = IntegerField('Amount')
     submit = SubmitField('Make Your Bet')

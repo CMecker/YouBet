@@ -105,8 +105,9 @@ def event_bet(eventname):
                 else:
                     event.amount = form.amount.data
                 current_user.coins = current_user.coins - form.amount.data
-                its_a_bet = Bet(better=current_user, betted_on=event, amount=form.amount.data)
-                db.session.add(its_a_bet)
+                winna = User.query.filter_by(username=form.betwinner.data).first_or_404()
+                abet = Bet(user=current_user, winner=winna, event=event, amount=form.amount.data)
+                db.session.add(abet)
                 db.session.commit()
                 return redirect(url_for('event'))
             else:
@@ -173,20 +174,6 @@ def set_coins(username):
 @login_required
 def create_event():
     form = EventRegistrationForm()
-   # if form.validate_on_submit():
-   #     event = Event(
-   #         eventname=form.eventname.data,
-   #         time_to_bet=form.time_to_bet.data,
-   #     )
-   #     challengeri = User.query.filter_by(username=form.challenger.data).first_or_404()
-   #     event.add_challenger(challengeri)
-   #     if form.more_challenger.data != '':
-   #         more_challenger = User.query.filter_by(username=form.more_challenger.data).first_or_404()
-   #         event.add_challenger(more_challenger)
-   #     db.session.add(event)
-   #     db.session.commit()
-   #     flash('Creation succeded!')
-   #     return redirect(url_for('event'))
     return render_template('events/create_event.html', title='CreateEvent', form=form)
 
 
