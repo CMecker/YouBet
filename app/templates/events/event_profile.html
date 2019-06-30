@@ -15,7 +15,14 @@
             {% for dudes in event.challengers %}
                 <a href="{{ url_for('user', username=dudes.username)}}">{{ dudes.username }}; </a>
             {% endfor %}
-        {% endif %}<hr>
-        <button><a href="{{ url_for('event_bet', eventname=event.eventname) }}">Bet</a></button>
+        {% endif %}
+        <hr>
+        <button>
+            <a href="{{ url_for('event_bet', eventname=event.eventname) }}">Bet</a>
+        </button>
+        <hr>
+        <button type="button" class="btn btn-secondary">
+            <a href="{{ url_for('validate_event', eventname=event.eventname) }}">Validate</a>
+        </button>
     </section>
 {% endblock %}
