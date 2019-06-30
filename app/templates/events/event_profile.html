@@ -44,8 +44,16 @@
             {% for dudes in event.challengers %}
                 <a href="{{ url_for('user', username=dudes.username)}}">{{ dudes.username }}; </a>
             {% endfor %}
-        {% endif %}<hr>
-        <button><a href="{{ url_for('event_bet', eventname=event.eventname) }}">Bet</a></button>
+        {% endif %}
+        <hr>
+        <section>
+            <button type="button" class="btn btn-secondary">
+                <a href="{{ url_for('event_bet', eventname=event.eventname) }}">Bet</a>
+            </button>
+            <button type="button" class="btn btn-secondary">
+                <a href="{{ url_for('validate_event', eventname=event.eventname) }}">Validate</a>
+            </button>
+        </section>
       </div>
       <div class="column">
         {% if form %}
@@ -70,10 +78,7 @@
         {% if next_url %}
         <a href="{{ next_url }}">Older posts</a>
         {% endif %}
+        <hr>
       </div>
     </div>
-
-
-
-
 {% endblock %}

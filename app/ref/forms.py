@@ -41,19 +41,25 @@ class EventRegistrationForm(FlaskForm):
     about_event = TextAreaField('Desricption', validators=[Length(min=0, max=140)])
     submit = SubmitField('Create')
 
+class EventWinningForm(FlaskForm):
+
+    def validate_eventname(self, eventname):
+        event = Event.query.filter_by(eventname=eventname.data).first()
+        if event is not None:
+            raise ValidationError('Unvalid eventname.')
+
+    eventname = StringField('Eventname', validators=[DataRequired()])
+    winner = StringField('Winner')
+    submit = SubmitField('Create')
+
 class EventBetForm(FlaskForm):
 
     def __init__(self, original_username, *args, **kwargs):
         super(EventBetForm, self).__init__(*args, **kwargs)
         self.original_username = original_username
 
-    def validate_username(self, username):
-        if username.data != self.original_username:
-            user = User.query.filter_by(username=self.username.data).first()
-            if user is not None:
-                raise ValidationError('Unvalid username.')
-    
-    username = StringField('Challenger')
+    username = StringField('User')
+    betwinner = StringField('Challenger')
     betonloose = BooleanField('Bet on Loose')
     amount = IntegerField('Amount')
     submit = SubmitField('Make Your Bet')

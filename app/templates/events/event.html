@@ -9,7 +9,7 @@
             <a href="{{ url_for('create_event') }}">Create</a>
         </button>
         <button type="button" class="btn btn-secondary">
-            <a href="{{ url_for('validate_event') }}">Validate</a>
+            <a href="{{ url_for('validate_events') }}">Validate All</a>
         </button>
     </div>
     {% for post in posts %}
@@ -32,6 +32,14 @@
                         <td scope="row"> {{ ev['time_to_bet'] }} </td>
                         <td scope="row"> {{ ev['amount'] }} </td>
 			<td scope="row"> {% for dudes in ev['challenger'] %}<a href="{{ url_for('user', username=dudes ) }}">{{ dudes }}, </a>{% endfor %}</td>
+                        <td scope="row">
+                            <button type="button" class="btn btn-secondary">
+                                <a href="{{ url_for('put_winner', eventname=ev['name']) }}">Set_Win</a>
+                            </button>
+                            <button type="button" class="btn btn-secondary">
+                                <a href="{{ url_for('validate_event', eventname=ev['name']) }}">Validate</a>
+                            </button>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
