@@ -206,13 +206,21 @@ def validate_events():
     else:
         for one_event in event:
             diff = one_event.time_to_bet - datetime.utcnow()
-            if diff.days < 0:
+            if diff.days < 0 and one_event.winsetted:
                 val_ev = Event.query.filter_by(eventname=one_event.eventname).all()
                 for od_ev in val_ev:
-                    for bettings in od_ev.bets:
-                        winuser = User.query.filter_by(id=bettings.user_id).first_or_404()
-                        winuser.coins = winuser.coins + bettings.amount * 2
-                        db.session.commit()
+                    betsonev = Bet.query.filter_by(event_id=od_ev.id)
+                    if betsonev:
+                        for bettings in betsonev:
+                            winnerinbet = User.query.get(bettings.winner_id)
+                            if winnerinbet in od_ev.winners and bettings.betonloose is False:
+                                bettings.user.coins = bettings.user.coins + bettings.amount * 2
+                                db.session.delete(bettings)
+                            elif winnerinbet not in od_ev.winners and bettings.betonloose is True:
+                                bettings.user.coins = bettings.user.coins + bettings.amount * 2
+                                db.session.delete(bettings)
+                            else:
+                                db.session.delete(bettings)
                     db.session.delete(od_ev)
                     db.session.commit()
     return redirect(url_for('event'))
@@ -235,8 +243,7 @@ def validate_event(eventname):
                 if bettings.betonloose:
                     import pdb;pdb.set_trace()
                 else:
-                    winuser = User.query.filter_by(id=bettings.user_id).first_or_404()
-                    winuser.coins = winuser.coins + bettings.amount * 2
+                    bettings.user.coins = bettings.user.coins + bettings.amount * 2
                     db.session.commit()
             db.session.delete(eventDb)
             db.session.commit()
