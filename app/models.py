@@ -104,7 +104,7 @@ class Event(db.Model):
     eventname = db.Column(db.String(64), index=True, unique=True)
     time_to_bet = db.Column(db.DateTime)
     amount = db.Column(db.Integer)
-    winsetted = db.Column(db.Boolean)
+    winsetted = db.Column(db.Boolean, default=False)
     betting_quote = db.Column(db.String(30))
     posts = db.relationship('Post', backref='title')
 

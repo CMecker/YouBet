@@ -231,6 +231,7 @@ def validate_events():
 def validate_event(eventname):
     user = User.query.filter_by(username=current_user.username).first_or_404()
     eventDb = Event.query.filter_by(eventname=eventname).first_or_404()
+    import pdb;pdb.set_trace()
     if current_user.username != 'admin':
         flash('You are no Admin.')
         return redirect(url_for('event'))
@@ -251,6 +252,8 @@ def validate_event(eventname):
                         db.session.delete(bettings)
             db.session.delete(eventDb)
             db.session.commit()
+        elif not eventDb.winsetted:
+            flash('No Winner determined yet')
     return redirect(url_for('event'))
 
 
