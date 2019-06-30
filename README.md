@@ -10,7 +10,7 @@ YouBet is a ScoialNetwork for your bets. You can create your own events and bet 
 2.3.1 Linux/Mac: `. venv/bin/activate`  
 2.3.2 Windows: `venv\Scripts\activate`
 
-### Datenbank installieren
+### Database install (necessary)
 
 3.1 Xampp download and install (https://www.apachefriends.org/de/download.html)  
 3.2 Xampp Control-Panel --> start Apache und MySQL  
@@ -18,7 +18,7 @@ YouBet is a ScoialNetwork for your bets. You can create your own events and bet 
 Name: **any**  
 Kollation: **utf8_general_ci**
 
-### Projekt initialise
+### Projekt initialise (necessary)
 
 4.1 _db_config.py_ copy into directory 
 4.2 `pip install -r requirements.txt`  
@@ -26,7 +26,7 @@ Kollation: **utf8_general_ci**
 4.3.2 Windows: `set FLASK_APP=main.py`  
 4.4 Create tables `flask db init` (deleted migrations directory if there are problems)
 
-### Server 
+### Server run (necessary)
 5.1 `flask run`  
 5.2  http://localhost:5000/   
 
