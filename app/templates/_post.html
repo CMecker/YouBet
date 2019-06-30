@@ -6,11 +6,7 @@
 			<td>
 				<a href="{{ url_for('user', username=post.author.username) }}">
 					{{ post.author.username }}
-				</a>
-                {% if post.timestamp %}
-                <p>posted {{moment(post.timestamp).fromNow() }}</p>
-                {% endif %}
-				<br>
+				</a><br>
 				{{ post.body }}
 			</td>
         	</tr>

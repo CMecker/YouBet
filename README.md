@@ -31,7 +31,7 @@ Kollation: **utf8_general_ci**
 Ordner l&ouml;schen)
 
 ##### Server starten
-5.1 virtualEnv aktiviert? Schritt 2.3  
+5.1 virtualEnv aktiviert? --> Siehe Schritt 2.3  
 5.2 `flask run`  
 5.3  http://localhost:5000/ im Browser aufrufen  
 

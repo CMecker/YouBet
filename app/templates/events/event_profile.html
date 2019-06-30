@@ -20,7 +20,6 @@
     </section>
     <section>
 	{% for post in posts %}
-        <h1>{{ post.user_id }} Hallo</h1>
 		{% include '_post.html' %}
 	{% endfor %}
 	{% if prev_url %}

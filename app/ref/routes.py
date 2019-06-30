@@ -6,7 +6,6 @@ from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileFo
     GetCoinForm
 from datetime import datetime
 from app import app, db
-import pdb
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -266,12 +265,12 @@ def event():
 def event_profile(eventname):
 
     event = Event.query.filter_by(eventname=eventname).first_or_404()
-    post = Post.query.filter_by(event_id=event.id).first()
-    us = User.query.filter_by(id=post.user_id).first()
-    # pdb.set_trace()
-    posts = [
-        {'author': us, 'body': post.body},
-    ]
+    post_query = Post.query.filter_by(event_id=event.id).all()
+    posts = []
+    for post in post_query:
+        us = User.query.filter_by(id=post.user_id).first()
+        posts.append({'author': us, 'body': post.body})
+
     return render_template('events/event_profile.html', event=event, posts=posts)
 
 
