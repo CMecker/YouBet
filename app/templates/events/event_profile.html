@@ -7,39 +7,73 @@
             <td><h3>Event: {{ event.eventname }}</h3></td><br>
 		</tr>
 	</header>
-    <section>
-<!--        {{event}}<hr>-->
-        {% if event.time_to_bet %} BetEnding: {{ event.time_to_bet }} {% endif %}<hr>
-        {% if event.amount%} Total Bets: {{ event.amount }} {% endif %}<hr>
-        {% if event.challengers%} Challengers: 
+    <style>
+        * {
+          box-sizing: border-box;
+        }
+
+        /* Create two equal columns that floats next to each other */
+        .column {
+          float: left;
+          width: 50%;
+          padding: 10px;
+          height: 300px; /* Should be removed. Only for demonstration */
+        }
+
+        /* Clear floats after the columns */
+        .row:after {
+          content: "";
+          display: table;
+          clear: both;
+        }
+
+        /* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+        @media screen and (max-width: 600px) {
+          .column {
+            width: 100%;
+          }
+        }
+
+    </style>
+
+    <div class="row">
+      <div class="column">
+        {% if event.time_to_bet %} BetEnding: {{ event.time_to_bet }} {% endif %}<br>
+        {% if event.amount%} Total Bets: {{ event.amount }} {% endif %}<br>
+        {% if event.challengers%} Challengers:
             {% for dudes in event.challengers %}
                 <a href="{{ url_for('user', username=dudes.username)}}">{{ dudes.username }}; </a>
             {% endfor %}
         {% endif %}<hr>
         <button><a href="{{ url_for('event_bet', eventname=event.eventname) }}">Bet</a></button>
-    </section>
-    <section>
-    {% if form %}
+      </div>
+      <div class="column">
+        {% if form %}
             <form action="" method="post">
             {{ form.hidden_tag() }}
             <p>
                 {{ form.post.label }}<br>
-                {{ form.post(cols=32, rows=4) }}<br>
+                {{ form.post(cols=32, rows=1) }}
                 {% for error in form.post.errors %}
                 <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
             </p>
-            <p>{{ form.submit() }}</p>
+            <p>{{ form.submit() }}</p><hr>
         </form>
-	{% endif %}
-	{% for post in posts %}
-		{% include '_post.html' %}
-	{% endfor %}
-	{% if prev_url %}
-	<a href="{{ prev_url }}">Newer posts</a>
-	{% endif %}
-	{% if next_url %}
-	<a href="{{ next_url }}">Older posts</a>
-	{% endif %}
-    </section>
+        {% endif %}
+        {% for post in posts %}
+            {% include '_post.html' %}
+        {% endfor %}
+        {% if prev_url %}
+        <a href="{{ prev_url }}">Newer posts</a>
+        {% endif %}
+        {% if next_url %}
+        <a href="{{ next_url }}">Older posts</a>
+        {% endif %}
+      </div>
+    </div>
+
+
+
+
 {% endblock %}
