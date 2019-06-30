@@ -40,5 +40,3 @@ GithubProject-WebTechniken2019
 * export FLASK_APP=main.py  
 * flask run  
 * open in Browser localhost:5000  
-* -> user: test  
-* -> pw: 123  
