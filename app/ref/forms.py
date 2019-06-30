@@ -41,7 +41,7 @@ class EventRegistrationForm(FlaskForm):
     about_event = TextAreaField('Desricption', validators=[Length(min=0, max=140)])
     submit = SubmitField('Create')
 
-class EventValidationForm(FlaskForm):
+class EventWinningForm(FlaskForm):
 
     def validate_eventname(self, eventname):
         event = Event.query.filter_by(eventname=eventname.data).first()

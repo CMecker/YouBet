@@ -235,7 +235,7 @@ def validate_event():
 @app.route('/<eventname>/put_winner', methods=['GET', 'POST'])
 @login_required
 def put_winner(eventname):
-    form = EventValidationForm(eventname)
+    form = EventWinningForm(eventname)
     if request.method == 'GET':
         form.eventname.data = eventname
     return render_template('events/put_winner.html', title='PutWinner', form=form)
