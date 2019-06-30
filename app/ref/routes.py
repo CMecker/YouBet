@@ -231,14 +231,13 @@ def validate_events():
 def validate_event(eventname):
     user = User.query.filter_by(username=current_user.username).first_or_404()
     eventDb = Event.query.filter_by(eventname=eventname).first_or_404()
-    bets = Bet.query.filter_by(event_id=eventDb.id).first_or_404()
     if current_user.username != 'admin':
         flash('You are no Admin.')
         return redirect(url_for('event'))
     else:
-        import pdb;pdb.set_trace()
+        diff = eventDb.time_to_bet - datetime.utcnow()
         if diff.days < 0 and eventDb.winsetted:
-            betsonev = Bet.query.filter_by(event_id=EventDb.id)
+            betsonev = Bet.query.filter_by(event_id=eventDb.id)
             if betsonev:
                 for bettings in betsonev:
                     winnerinbet = User.query.get(bettings.winner_id)
