@@ -208,9 +208,9 @@ def add_challenger():
     return redirect(url_for('event'))
 
 
-@app.route('/event/validate_event', methods=['GET', 'POST'])
+@app.route('/event/validate_events', methods=['GET', 'POST'])
 @login_required
-def validate_event():
+def validate_events():
     user = User.query.filter_by(username=current_user.username).first_or_404()
     event = Event.query.all()
     bets = Bet.query.all()
