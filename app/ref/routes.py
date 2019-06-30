@@ -236,15 +236,20 @@ def validate_event(eventname):
         flash('You are no Admin.')
         return redirect(url_for('event'))
     else:
-        #diff = eventDb.time_to_bet - datetime.utcnow()
         import pdb;pdb.set_trace()
-        if eventDb.winsetted:
-            for bettings in eventDb.bets:
-                if bettings.betonloose:
-                    import pdb;pdb.set_trace()
-                else:
-                    bettings.user.coins = bettings.user.coins + bettings.amount * 2
-                    db.session.commit()
+        if diff.days < 0 and eventDb.winsetted:
+            betsonev = Bet.query.filter_by(event_id=EventDb.id)
+            if betsonev:
+                for bettings in betsonev:
+                    winnerinbet = User.query.get(bettings.winner_id)
+                    if winnerinbet in evenDb.winners and bettings.betonloose is False:
+                        bettings.user.coins = bettings.user.coins + bettings.amount * 2
+                        db.session.delete(bettings)
+                    elif winnerinbet not in eventDb.winners and bettings.betonloose is True:
+                        bettings.user.coins = bettings.user.coins + bettings.amount * 2
+                        db.session.delete(bettings)
+                    else:
+                        db.session.delete(bettings)
             db.session.delete(eventDb)
             db.session.commit()
     return redirect(url_for('event'))
