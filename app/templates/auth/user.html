@@ -3,25 +3,33 @@
 
 {% block app_content %}
 	<table>
-		<tr valign="top">
+		<tr valign="middle">
 			<td><img src="{{ user.avatar(128) }}"></td>
-			<td><h1>User: {{ user.username }}</h1></td>
+			<td style="padding-left: 20px">
+                <h3>{{ user.username }}</h3>
+
+                {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
+                {% if user.last_seen %}<p>Last seen on: {{ user.last_seen }}</p>{% endif %}
+                {% if user.coins %}<p>Money in the Bank: {{ user.coins }}</p>{% endif %}
+                <p>{{ user.followers.count() }} followers, {{ user.followed.count() }} following.</p>
+            </td>
 		</tr>
 	</table>
     <br>
     <div>
-        {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
-        {% if user.last_seen %}<p>Last seen on: {{moment(user.last_seen).fromNow() }}</p>{% endif %}
-        {% if user.coins %}<p>Money in the Bank: {{ user.coins }}</p>{% endif %}
-        <p>{{ user.followers.count() }} followers, {{ user.followed.count() }} following.</p>
         {% if user == current_user %}
-        <p><a href="{{ url_for('edit_profile') }}">Edit your profile</a></p>
+        <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored"  href="{{ url_for('edit_profile') }}">Edit your profile</a><br>
         {% elif not current_user.is_following(user) %}
-        <p><a href="{{ url_for('follow', username=user.username) }}">Follow</a></p>
+        <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('follow', username=user.username) }}">Follow</a><br>
         {% else %}
-        <p><a href="{{ url_for('unfollow', username=user.username) }}">Unfollow</a></p>
+        <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('unfollow', username=user.username) }}">Unfollow</a><br>
         {% endif %}
-        <br>
-        <p><a href="{{ url_for('set_coins', username=user.username) }}">ResetBank</a></p>
+        <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('set_coins', username=user.username) }}">ResetBank</a><br>
+
+        <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" class="mdl-navigation__link" href="{{ url_for('logout') }}">Logout</a><br>
+
     </div>
+
+
+
 {% endblock %}

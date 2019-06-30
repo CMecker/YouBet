@@ -1,7 +1,12 @@
 {% extends 'bootstrap/base.html' %}
+<!DOCTYPE>
 
 {% block title %}
     {% if title %}{{ title }} - YouBet{% else %}Welcome to YouBet{% endif %}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
 {% endblock %}
 
 {% block navbar %}
@@ -18,9 +23,10 @@
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('index') }}">Home</a></li>
-                    <li><a href="{{ url_for('shop') }}">Shop</a></li>
-                    <li><a href="{{ url_for('event') }}">Upcoming</a></li>
+                    <li><a href="{{ url_for('event') }}">Events</a></li>
+                    <li><a href="{{ url_for('user_list') }}">User</a></li>
+                    <li><a href="{{ url_for('shop') }}">Coin-Shop</a></li>
+                    <li><a href="{{ url_for('impressum') }}">Impressum</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if current_user.is_anonymous %}
@@ -34,7 +40,6 @@
         </div>
     </nav>
 {% endblock %}
-
 {% block content %}
     <div class="container">
         {% with messages = get_flashed_messages() %}
@@ -42,13 +47,9 @@
             {% for message in messages %}
             <div class="alert alert-info" role="alert">{{ message }}</div>
             {% endfor %}
-        {% endif %}
+            {% endif %}
         {% endwith %}
 	{% block app_content %}{% endblock %}
     </div>
 {% endblock %}
 
-{% block scripts %}
-    {{ super() }}
-    {{ moment.include_moment() }}
-{% endblock %}

@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, DateField, IntegerField, FloatField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, IntegerField, FloatField
+from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, ValidationError, DataRequired, Email, EqualTo, Length
 from app.models import User, Event
 
@@ -35,8 +36,20 @@ class EventRegistrationForm(FlaskForm):
             raise ValidationError('Unvalid eventname.')
 
     eventname = StringField('Eventname', validators=[DataRequired()])
+    chll = StringField('Challenger')
     time_to_bet = DateField('TimeToBet', format='%Y-%m-%d', validators=[DataRequired()])
     about_event = TextAreaField('Desricption', validators=[Length(min=0, max=140)])
+    submit = SubmitField('Create')
+
+class EventWinningForm(FlaskForm):
+
+    def validate_eventname(self, eventname):
+        event = Event.query.filter_by(eventname=eventname.data).first()
+        if event is not None:
+            raise ValidationError('Unvalid eventname.')
+
+    eventname = StringField('Eventname', validators=[DataRequired()])
+    winner = StringField('Winner')
     submit = SubmitField('Create')
 
 class EventBetForm(FlaskForm):
@@ -45,12 +58,9 @@ class EventBetForm(FlaskForm):
         super(EventBetForm, self).__init__(*args, **kwargs)
         self.original_username = original_username
 
-    def validate_username(self, username):
-        if username.data != self.original_username:
-            user = User.query.filter_by(username=self.username.data).first()
-            if user is not None:
-                raise ValidationError('Unvalid username.')
-
+    username = StringField('User')
+    betwinner = StringField('Challenger')
+    betonloose = BooleanField('Bet on Loose')
     amount = IntegerField('Amount')
     submit = SubmitField('Make Your Bet')
 

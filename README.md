@@ -1,42 +1,36 @@
-# YouBet
-GithubProject-WebTechniken2019
-
+# YouBet 
+## Projekt Webtechniken 2019
+YouBet is a ScoialNetwork for your bets. You can create your own events and bet with your friends with virtual money
 ## Initialise:
+1 `git clone https://github.com/CMecker/YouBet.git`
 
-### Clone by HTTPS:
+### Virtual Envirement install (optional)
+2.1 `pip install virtualenv`  
+2.2 `virtualenv venv`  
+2.3.1 Linux/Mac: `. venv/bin/activate`  
+2.3.2 Windows: `venv\Scripts\activate`
 
-* go to path where you want to save your repo
-* _git clone https://github.com/CMecker/YouBet.git_
+### Datenbank installieren
 
-### Clone per SSH(recommended)
+3.1 Xampp download and install (https://www.apachefriends.org/de/download.html)  
+3.2 Xampp Control-Panel --> start Apache und MySQL  
+3.3 Access: http://localhost/phpmyadmin/ create new Db  
+Name: **any**  
+Kollation: **utf8_general_ci**
 
-#### Create Key 
+### Projekt initialise
 
-* _ssh-keygen -t rsa -C "Hier@eure.email"  
-* Path is not needed if its first key  
-* set passphrase (not necessary)  
-* public key located at  
-* /c/Users/User/.ssh/id_rsa.pub  
-* add on git to Profile/Settings/SSH_and_GPG_keys  
-* go to path where you want to save your repo
-* _git clone github.com/CMecker/YouBet.git_  
+4.1 _db_config.py_ copy into directory 
+4.2 `pip install -r requirements.txt`  
+4.3.1 Linux/Mac: `export FLASK_APP=main.py`  
+4.3.2 Windows: `set FLASK_APP=main.py`  
+4.4 Create tables `flask db init` (deleted migrations directory if there are problems)
 
-### VirtualEnv (optional)
+### Server 
+5.1 `flask run`  
+5.2  http://localhost:5000/   
 
-* pip install virtualenv  
-* virtualenv venv  
-* . venv/Scripts/activate (under Windows to activate virtual Env)  
-
-### install MySQL
-
-* xampp (https://www.apachefriends.org/de/download.html)
-* Xampp Control Panel --> start Apache, MySQL --> access: http://localhost/phpmyadmin/
-* flask db migrate -m "Changed db"(if changes made)  
-* flask db upgrade  
-
-### Run Flask
-
-* pip install -r requirements.txt  
-* export FLASK_APP=main.py  
-* flask run  
-* open in Browser localhost:5000  
+### Db updates
+- if changes made in models:  
+    - `flask db migrate -m "Changed db"`  
+    - `flask db upgrade`  

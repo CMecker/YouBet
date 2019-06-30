@@ -9,9 +9,31 @@ followers = db.Table('followers',
         db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
 )
 
+challengers = db.Table('challengers',
+        db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
+        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
+
+winners = db.Table('winners',
+        db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
+        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
+
+#betwinner = db.Table('betwinner',
+#        db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
+#        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+#)
+#
+#userbets = db.Table('userbets',
+#        db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
+#        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+#)
+
 #NEEDING Delete Option
 class User(UserMixin, db.Model):
 
+    __tablename__ = 'user'
+    
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
@@ -54,7 +76,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
-    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+    last_seen = db.Column(db.DateTime, default=datetime.now())
     coins = db.Column(db.Integer, default=10)
 
     followed = db.relationship(
@@ -63,20 +85,40 @@ class User(UserMixin, db.Model):
         secondaryjoin=(followers.c.followed_id == id),
         backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
+
 #NEEDING Delete Option
 class Event(db.Model):
 
+    __tablename__ = 'event'
+
     def __repr__(self):
         return '<Event {}>'.format(self.eventname)
+
+    def add_challenger(self, user):
+        self.challengers.append(user)
+
+    def add_winner(self, user):
+        self.winners.append(user)
 
     id = db.Column(db.Integer, primary_key=True)
     eventname = db.Column(db.String(64), index=True, unique=True)
     time_to_bet = db.Column(db.DateTime)
     amount = db.Column(db.Integer)
+    winsetted = db.Column(db.Boolean, default=False)
     betting_quote = db.Column(db.String(30))
     posts = db.relationship('Post', backref='title')
 
+    winners = db.relationship(
+        'User', secondary=winners, lazy='subquery',
+        backref=db.backref('winners', lazy=True))
+
+    challengers = db.relationship(
+        'User', secondary=challengers, lazy='subquery',
+        backref=db.backref('challengers', lazy=True))
+
 class Post(db.Model):
+
+    __tablename__ = 'post'
 
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.String(140))
@@ -86,15 +128,35 @@ class Post(db.Model):
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
+
+class Bet(db.Model):
+
+    __tablename__ = 'bet'
+
+    def __repr__(self):
+        return '<Amount {}>'.format(self.amount)
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, index=True,default=datetime.utcnow)
+    betonloose = db.Column(db.Boolean, default=False)
+    amount = db.Column(db.Integer)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    winner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    user = db.relationship('User', foreign_keys=[user_id])
+    winner = db.relationship('User', foreign_keys=[winner_id])
+    event = db.relationship('Event', foreign_keys=[event_id])
+
+#    userbets = db.relationship(
+#        'User', secondary=userbets, lazy='subquery',
+#        backref=db.backref('userbets', lazy=True))
+#
+#    betwinner = db.relationship(
+#        'User', secondary=betwinner, lazy='subquery',
+#        backref=db.backref('betwinner', lazy=True))
+
     
-
-#needs table for single event
-#events = db.Table('events',
-#        db.Column('better_id', db.Integer, db.ForeignKey('user.id')),
-#        db.Column('player_id', db.Integer, db.ForeignKey('user.id'))
-#)
-
-
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))

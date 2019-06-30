@@ -2,8 +2,9 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-	<h1>Hi, {{ current_user.username }}!</h1>
-	{% if form %}
+    <h3>Hi, {{ current_user.username }}!</h3>
+    {% if form %}
+
 	<form action="" method="post">
 		{{ form.hidden_tag() }}
 		<p>
@@ -25,4 +26,5 @@
 	{% if next_url %}
 	<a href="{{ next_url }}">Older posts</a>
 	{% endif %}
+
 {% endblock %}

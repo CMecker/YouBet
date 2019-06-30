@@ -1,0 +1,64 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+.mdl-layout__header {
+    background: rgb(63, 81, 181) !important;
+}
+
+.mdl-layout__content {
+    padding: 2em;
+}
+
+
+/* Style the header */
+.header {
+    grid-area: header;
+    background-color: #f1f1f1;
+    padding: 30px;
+    font-size: 35px;
+}
+
+/* The grid container */
+.grid-container {
+    display: grid;
+    grid-template-areas: 'header header header header header header' 'left middle middle middle middle right' 'footer footer footer footer footer footer';
+    grid-column-gap: 10px;
+    -if you want gap between the columns */
+}
+
+.left,
+.middle,
+.right {
+    padding: 10px;
+    height: 300px; /* Should be removed. Only for demonstration */
+}
+
+/* Style the left column */
+.left {
+    grid-area: left;
+}
+
+/* Style the middle column */
+.middle {
+    grid-area: middle;
+}
+
+/* Style the right column */
+.right {
+    grid-area: right;
+}
+
+/* Style the footer */
+.footer {
+    grid-area: footer;
+    background-color: #f1f1f1;
+    padding: 10px;
+    text-align: center;
+}
+

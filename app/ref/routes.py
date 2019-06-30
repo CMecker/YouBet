@@ -1,10 +1,11 @@
 from flask import render_template, redirect, flash, url_for, request
-from app.ref import ref_bp 
+from app.ref import ref_bp
 from flask_login import current_user, login_user, login_required, logout_user
-from app.models import User, Post, Event
-from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, GetCoinForm
+from app.models import User, Post, Event, Bet
+from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, GetCoinForm, EventWinningForm
 from datetime import datetime
 from app import app, db
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -17,24 +18,14 @@ def index():
         db.session.commit()
         flash('Your post is now live!')
         return redirect(url_for('index'))
-    posts = [
-        {
-            'author': {'username': 'Bran'},
-            'body': 'Best game eva!'
-        },
-        {
-            'author': {'username': 'test'},
-            'body': 'chat some!'
-        }
-    ]
     page = request.args.get('page', 1, type=int)
     posts = current_user.followed_posts().paginate(
         page, app.config['POSTS_PER_PAGE'], False)
-    next_url = url_for('index', page=posts.next_num) \
-        if posts.has_next else None
-    prev_url = url_for('index', page=posts.prev_num) \
-        if posts.has_prev else None
-    return render_template('index.html', title='Home', form=form, posts=posts.items, next_url=next_url, prev_url=prev_url)
+    next_url = url_for('index', page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('index', page=posts.prev_num) if posts.has_prev else None
+    return render_template('index.html', title='Home', form=form, posts=posts.items, next_url=next_url,
+                           prev_url=prev_url)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -50,10 +41,12 @@ def login():
         return redirect(url_for('index'))
     return render_template('auth/login.html', title='Sign In', form=form)
 
+
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -69,6 +62,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('auth/register.html', title='Register', form=form)
 
+
 @app.route('/user/<username>')
 @login_required
 def user(username):
@@ -76,7 +70,26 @@ def user(username):
     posts = [
         {'author': user, 'body': ''},
     ]
-    return render_template('auth/user.html', user=user, posts=posts)
+    return render_template('auth/user.html', title='Profile', user=user, posts=posts)
+
+@app.route('/user')
+@login_required
+def user_list():
+    query = User.query.all()
+    userlist = []
+    if query:
+        for user in query:
+            userlist.append({
+                'id': user.id,
+                'username': user.username,
+                'about_me': user.about_me,
+                'last_seen': user.last_seen,
+                'coins': user.coins
+            })
+        post = {'title': user, 'body': userlist},
+        return render_template('user_list.html', posts=post)
+    else:
+        return redirect(url_for('index')) #Should be impossible
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -93,6 +106,7 @@ def edit_profile():
         form.about_me.data = current_user.about_me
     return render_template('auth/edit_profile.html', title='Edit Profile', form=form)
 
+
 @app.route('/event/<eventname>/bet', methods=['GET', 'POST'])
 @login_required
 def event_bet(eventname):
@@ -100,20 +114,29 @@ def event_bet(eventname):
     event = Event.query.filter_by(eventname=eventname).first_or_404()
     user = User.query.filter_by(username=current_user.username).first_or_404()
     if form.validate_on_submit():
-        if (current_user.coins>form.amount.data):
-            if event.amount:
-                event.amount = event.amount + form.amount.data
+        diff = event.time_to_bet - datetime.utcnow()
+        if diff.days>0:
+            if (current_user.coins>form.amount.data):
+                if event.amount:
+                    event.amount = event.amount + form.amount.data
+                else:
+                    event.amount = form.amount.data
+                current_user.coins = current_user.coins - form.amount.data
+                winna = User.query.filter_by(username=form.betwinner.data).first_or_404()
+                abet = Bet(user=current_user, winner=winna, event=event, amount=form.amount.data)
+                db.session.add(abet)
+                db.session.commit()
+                return redirect(url_for('event'))
             else:
-                event.amount = form.amount.data
-            current_user.coins = current_user.coins - form.amount.data
+                return redirect(url_for('shop', username=current_user.username))
         else:
-            return redirect(url_for('shop', username=current_user.username))
-        db.session.commit()
-        return redirect(url_for('user', username=current_user.username))
+            flash('Event {} already ended.'.format(eventname))
+            return redirect(url_for('event'))
     posts = [
         {'title': event, 'body': ''},
     ]
     return render_template('events/event_bet.html', title='Bet Event', form=form)
+
 
 @app.route('/follow/<username>')
 @login_required
@@ -130,6 +153,7 @@ def follow(username):
     flash('You are following {}!'.format(username))
     return redirect(url_for('user', username=username))
 
+
 @app.route('/unfollow/<username>')
 @login_required
 def unfollow(username):
@@ -144,6 +168,7 @@ def unfollow(username):
     db.session.commit()
     flash('You are not following {}.'.format(username))
     return redirect(url_for('user', username=username))
+
 
 @app.route('/set_coins/<username>')
 @login_required
@@ -166,37 +191,168 @@ def set_coins(username):
 @login_required
 def create_event():
     form = EventRegistrationForm()
-    if form.validate_on_submit():
-        event = Event(eventname=form.eventname.data, time_to_bet=form.time_to_bet.data)
-        time_to_bet = form.time_to_bet.data
-        db.session.add(event)
-        db.session.commit()
-        flash('Creation succeded!')
-        return redirect(url_for('event'))
     return render_template('events/create_event.html', title='CreateEvent', form=form)
+
+
+@app.route('/add_challenger', methods=['POST'])
+def add_challenger():
+    challName='challenger0'
+    event = Event(
+        eventname=request.form['eventname'],
+        time_to_bet=request.form['time_to_bet'],
+    )
+    for num in range(0, int(request.form['challenger'])):
+        challDb = User.query.filter_by(username=request.form[challName]).first_or_404()
+        event.add_challenger(challDb)
+        challName=challName.replace(str(num), str(num+1))
+    db.session.add(event)
+    db.session.commit()
+    flash('Creation succeded!')
+        
+    return redirect(url_for('event'))
+
+
+@app.route('/event/validate_events', methods=['GET', 'POST'])
+@login_required
+def validate_events():
+    user = User.query.filter_by(username=current_user.username).first_or_404()
+    event = Event.query.all()
+    if current_user.username != 'admin':
+        flash('You are no Admin.')
+        return redirect(url_for('event'))
+    else:
+        for one_event in event:
+            diff = one_event.time_to_bet - datetime.utcnow()
+            if diff.days < 0 and one_event.winsetted:
+                val_ev = Event.query.filter_by(eventname=one_event.eventname).all()
+                for od_ev in val_ev:
+                    betsonev = Bet.query.filter_by(event_id=od_ev.id)
+                    if betsonev:
+                        for bettings in betsonev:
+                            winnerinbet = User.query.get(bettings.winner_id)
+                            if winnerinbet in od_ev.winners and bettings.betonloose is False:
+                                bettings.user.coins = bettings.user.coins + bettings.amount * 2
+                                db.session.delete(bettings)
+                            elif winnerinbet not in od_ev.winners and bettings.betonloose is True:
+                                bettings.user.coins = bettings.user.coins + bettings.amount * 2
+                                db.session.delete(bettings)
+                            else:
+                                db.session.delete(bettings)
+                    db.session.delete(od_ev)
+                    db.session.commit()
+    return redirect(url_for('event'))
+
+
+@app.route('/event/<eventname>/validate_event', methods=['GET', 'POST'])
+@login_required
+def validate_event(eventname):
+    user = User.query.filter_by(username=current_user.username).first_or_404()
+    eventDb = Event.query.filter_by(eventname=eventname).first_or_404()
+    import pdb;pdb.set_trace()
+    if current_user.username != 'admin':
+        flash('You are no Admin.')
+        return redirect(url_for('event'))
+    else:
+        diff = eventDb.time_to_bet - datetime.utcnow()
+        if diff.days < 0 and eventDb.winsetted:
+            betsonev = Bet.query.filter_by(event_id=eventDb.id)
+            if betsonev:
+                for bettings in betsonev:
+                    winnerinbet = User.query.get(bettings.winner_id)
+                    if winnerinbet in evenDb.winners and bettings.betonloose is False:
+                        bettings.user.coins = bettings.user.coins + bettings.amount * 2
+                        db.session.delete(bettings)
+                    elif winnerinbet not in eventDb.winners and bettings.betonloose is True:
+                        bettings.user.coins = bettings.user.coins + bettings.amount * 2
+                        db.session.delete(bettings)
+                    else:
+                        db.session.delete(bettings)
+            db.session.delete(eventDb)
+            db.session.commit()
+        elif not eventDb.winsetted:
+            flash('No Winner determined yet')
+    return redirect(url_for('event'))
+
+
+@app.route('/<eventname>/put_winner', methods=['GET', 'POST'])
+@login_required
+def put_winner(eventname):
+    form = EventWinningForm(eventname)
+    if request.method == 'GET':
+        form.eventname.data = eventname
+    return render_template('events/put_winner.html', title='PutWinner', form=form)
+
+@app.route('/add_winner', methods=['POST'])
+@login_required
+def add_winner():
+    winnerName='winner0'
+    eventDb = Event.query.filter_by(eventname=request.form['eventname']).first_or_404()
+    for num in range(0, int(request.form['winner'])):
+        winnerDb = User.query.filter_by(username=request.form[winnerName]).first_or_404()
+        eventDb.add_winner(winnerDb)
+        winnerName=winnerName.replace(str(num), str(num+1))
+    eventDb.winsetted=True
+    db.session.add(eventDb)
+    db.session.commit()
+    flash('Winner set!')
+        
+    return redirect(url_for('event'))
+
 
 @app.route('/event')
 @login_required
 def event():
     que = Event.query.all()
     eventlist = []
-    for eve in que:
-        if not eve.amount:
-            eve.amount=0
-        if not eve.betting_quote:
-            eve.betting_quote='(0,5/0,5)'
-        eventlist.append({'id': eve.id, 'name': eve.eventname, 'time_to_bet': eve.time_to_bet, 'amount': eve.amount, 'betting_quote': eve.betting_quote})
-    post = {'title': event, 'body': eventlist},
-    return render_template('events/event.html', posts=post)
+    if que:
+        for eve in que:
+            challengerlist = []
+            for dudes in eve.challengers:
+                challengerlist.append(dudes.username)
+            if not eve.amount:
+                eve.amount = 0
+            if not eve.betting_quote:
+                eve.betting_quote = '(0,5/0,5)'
+            eventlist.append({
+                'id': eve.id,
+                'name': eve.eventname,
+                'time_to_bet': eve.time_to_bet,
+                'amount': eve.amount,
+                'challenger': challengerlist
+            })
+        post = {'title': event, 'body': eventlist},
+        return render_template('events/event.html', posts=post)
+    else:
+        return redirect(url_for('create_event'))
 
-@app.route('/event/<eventname>')
+
+@app.route('/event/<eventname>', methods=['GET', 'POST'])
 @login_required
 def event_profile(eventname):
     event = Event.query.filter_by(eventname=eventname).first_or_404()
-    posts = [
-        {'title': event, 'body': ''},
-    ]
-    return render_template('events/event_profile.html', event=event, posts=posts)
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(body=form.post.data, author=current_user)
+        post.event_id = event.id
+        db.session.add(post)
+        db.session.commit()
+        flash('Your post is now live!')
+        return redirect(url_for('event_profile', eventname=eventname))
+
+    page = request.args.get('page', 1, type=int)
+    posts = current_user.followed_posts().paginate(
+        page, app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('event_profile', eventname=eventname, page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('event_profile', eventname=eventname, page=posts.prev_num) if posts.has_prev else None
+    post_query = Post.query.filter_by(event_id=event.id).all()
+    posts = []
+    for post in post_query:
+        us = User.query.filter_by(id=post.user_id).first()
+        posts.append({'author': us, 'body': post.body})
+
+    return render_template('events/event_profile.html', event=event, posts=posts, form=form,
+                           next_url=next_url,prev_url=prev_url)
+
 
 @app.route('/shop', methods=['Get', 'Post'])
 @login_required
@@ -207,18 +363,16 @@ def shop():
         user.coins = user.coins + form.amount.data
         db.session.commit()
         return redirect(url_for('user', username=current_user.username))
-    return render_template("payment/shop.html", title='Shop', form=form)
+    return render_template("payment/shop.html", title='Deposit', form=form)
 
+@app.route('/impressum')
+def impressum():
+    return render_template('impressum.html')
 
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
-        current_user.last_seen = datetime.utcnow()
+        current_user.last_seen = datetime.now()
         db.session.commit()
-
-
-@app.route('/hello')
-def hello_world():
-	return 'Hello, World!'
 
 
