@@ -2,8 +2,7 @@ from flask import render_template, redirect, flash, url_for, request
 from app.ref import ref_bp
 from flask_login import current_user, login_user, login_required, logout_user
 from app.models import User, Post, Event, Bet
-from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, \
-    GetCoinForm
+from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, GetCoinForm, EventWinningForm
 from datetime import datetime
 from app import app, db
 
@@ -106,8 +105,9 @@ def event_bet(eventname):
                 else:
                     event.amount = form.amount.data
                 current_user.coins = current_user.coins - form.amount.data
-                its_a_bet = Bet(better=current_user, betted_on=event, amount=form.amount.data)
-                db.session.add(its_a_bet)
+                winna = User.query.filter_by(username=form.betwinner.data).first_or_404()
+                abet = Bet(user=current_user, winner=winna, event=event, amount=form.amount.data)
+                db.session.add(abet)
                 db.session.commit()
                 return redirect(url_for('event'))
             else:
@@ -174,20 +174,6 @@ def set_coins(username):
 @login_required
 def create_event():
     form = EventRegistrationForm()
-   # if form.validate_on_submit():
-   #     event = Event(
-   #         eventname=form.eventname.data,
-   #         time_to_bet=form.time_to_bet.data,
-   #     )
-   #     challengeri = User.query.filter_by(username=form.challenger.data).first_or_404()
-   #     event.add_challenger(challengeri)
-   #     if form.more_challenger.data != '':
-   #         more_challenger = User.query.filter_by(username=form.more_challenger.data).first_or_404()
-   #         event.add_challenger(more_challenger)
-   #     db.session.add(event)
-   #     db.session.commit()
-   #     flash('Creation succeded!')
-   #     return redirect(url_for('event'))
     return render_template('events/create_event.html', title='CreateEvent', form=form)
 
 
@@ -209,27 +195,90 @@ def add_challenger():
     return redirect(url_for('event'))
 
 
-@app.route('/event/validate_event', methods=['GET', 'POST'])
+@app.route('/event/validate_events', methods=['GET', 'POST'])
 @login_required
-def validate_event():
+def validate_events():
     user = User.query.filter_by(username=current_user.username).first_or_404()
     event = Event.query.all()
-    bets = Bet.query.all()
     if current_user.username != 'admin':
         flash('You are no Admin.')
         return redirect(url_for('event'))
     else:
         for one_event in event:
             diff = one_event.time_to_bet - datetime.utcnow()
-            if diff.days < 0:
+            if diff.days < 0 and one_event.winsetted:
                 val_ev = Event.query.filter_by(eventname=one_event.eventname).all()
                 for od_ev in val_ev:
-                    for bettings in od_ev.bets:
-                        winuser = User.query.filter_by(id=bettings.user_id).first_or_404()
-                        winuser.coins = winuser.coins + bettings.amount * 2
-                        db.session.commit()
+                    betsonev = Bet.query.filter_by(event_id=od_ev.id)
+                    if betsonev:
+                        for bettings in betsonev:
+                            winnerinbet = User.query.get(bettings.winner_id)
+                            if winnerinbet in od_ev.winners and bettings.betonloose is False:
+                                bettings.user.coins = bettings.user.coins + bettings.amount * 2
+                                db.session.delete(bettings)
+                            elif winnerinbet not in od_ev.winners and bettings.betonloose is True:
+                                bettings.user.coins = bettings.user.coins + bettings.amount * 2
+                                db.session.delete(bettings)
+                            else:
+                                db.session.delete(bettings)
                     db.session.delete(od_ev)
                     db.session.commit()
+    return redirect(url_for('event'))
+
+
+@app.route('/event/<eventname>/validate_event', methods=['GET', 'POST'])
+@login_required
+def validate_event(eventname):
+    user = User.query.filter_by(username=current_user.username).first_or_404()
+    eventDb = Event.query.filter_by(eventname=eventname).first_or_404()
+    import pdb;pdb.set_trace()
+    if current_user.username != 'admin':
+        flash('You are no Admin.')
+        return redirect(url_for('event'))
+    else:
+        diff = eventDb.time_to_bet - datetime.utcnow()
+        if diff.days < 0 and eventDb.winsetted:
+            betsonev = Bet.query.filter_by(event_id=eventDb.id)
+            if betsonev:
+                for bettings in betsonev:
+                    winnerinbet = User.query.get(bettings.winner_id)
+                    if winnerinbet in evenDb.winners and bettings.betonloose is False:
+                        bettings.user.coins = bettings.user.coins + bettings.amount * 2
+                        db.session.delete(bettings)
+                    elif winnerinbet not in eventDb.winners and bettings.betonloose is True:
+                        bettings.user.coins = bettings.user.coins + bettings.amount * 2
+                        db.session.delete(bettings)
+                    else:
+                        db.session.delete(bettings)
+            db.session.delete(eventDb)
+            db.session.commit()
+        elif not eventDb.winsetted:
+            flash('No Winner determined yet')
+    return redirect(url_for('event'))
+
+
+@app.route('/<eventname>/put_winner', methods=['GET', 'POST'])
+@login_required
+def put_winner(eventname):
+    form = EventWinningForm(eventname)
+    if request.method == 'GET':
+        form.eventname.data = eventname
+    return render_template('events/put_winner.html', title='PutWinner', form=form)
+
+@app.route('/add_winner', methods=['POST'])
+@login_required
+def add_winner():
+    winnerName='winner0'
+    eventDb = Event.query.filter_by(eventname=request.form['eventname']).first_or_404()
+    for num in range(0, int(request.form['winner'])):
+        winnerDb = User.query.filter_by(username=request.form[winnerName]).first_or_404()
+        eventDb.add_winner(winnerDb)
+        winnerName=winnerName.replace(str(num), str(num+1))
+    eventDb.winsetted=True
+    db.session.add(eventDb)
+    db.session.commit()
+    flash('Winner set!')
+        
     return redirect(url_for('event'))
 
 
