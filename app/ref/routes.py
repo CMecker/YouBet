@@ -72,7 +72,24 @@ def user(username):
     ]
     return render_template('auth/user.html', title='Profile', user=user, posts=posts)
 
-
+@app.route('/user')
+@login_required
+def user_list():
+    query = User.query.all()
+    userlist = []
+    if query:
+        for user in query:
+            userlist.append({
+                'id': user.id,
+                'username': user.username,
+                'about_me': user.about_me,
+                'last_seen': user.last_seen,
+                'coins': user.coins
+            })
+        post = {'title': user, 'body': userlist},
+        return render_template('user_list.html', posts=post)
+    else:
+        return redirect(url_for('index')) #Should be impossible
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -309,14 +326,32 @@ def event():
         return redirect(url_for('create_event'))
 
 
-@app.route('/event/<eventname>')
+@app.route('/event/<eventname>', methods=['GET', 'POST'])
 @login_required
 def event_profile(eventname):
     event = Event.query.filter_by(eventname=eventname).first_or_404()
-    posts = [
-        {'title': event, 'body': ''},
-    ]
-    return render_template('events/event_profile.html', event=event, posts=posts)
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(body=form.post.data, author=current_user)
+        post.event_id = event.id
+        db.session.add(post)
+        db.session.commit()
+        flash('Your post is now live!')
+        return redirect(url_for('event_profile', eventname=eventname))
+
+    page = request.args.get('page', 1, type=int)
+    posts = current_user.followed_posts().paginate(
+        page, app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('event_profile', eventname=eventname, page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('event_profile', eventname=eventname, page=posts.prev_num) if posts.has_prev else None
+    post_query = Post.query.filter_by(event_id=event.id).all()
+    posts = []
+    for post in post_query:
+        us = User.query.filter_by(id=post.user_id).first()
+        posts.append({'author': us, 'body': post.body})
+
+    return render_template('events/event_profile.html', event=event, posts=posts, form=form,
+                           next_url=next_url,prev_url=prev_url)
 
 
 @app.route('/shop', methods=['Get', 'Post'])
@@ -330,7 +365,7 @@ def shop():
         return redirect(url_for('user', username=current_user.username))
     return render_template("payment/shop.html", title='Deposit', form=form)
 
-@app.route('/impressum/')
+@app.route('/impressum')
 def impressum():
     return render_template('impressum.html')
 
