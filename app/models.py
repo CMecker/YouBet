@@ -9,8 +9,12 @@ followers = db.Table('followers',
         db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
 )
 
-
 challengers = db.Table('challengers',
+        db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
+        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
+
+winners = db.Table('winners',
         db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
         db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
 )
@@ -62,7 +66,6 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     bets = db.relationship('Bet', backref='better', lazy='dynamic')
-    challenges = db.relationship('Bet', backref='challenger', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.now())
     coins = db.Column(db.Integer, default=10)
@@ -85,17 +88,25 @@ class Event(db.Model):
     def add_challenger(self, user):
         self.challengers.append(user)
 
+    def add_winner(self, user):
+        self.winners.append(user)
+
     id = db.Column(db.Integer, primary_key=True)
     eventname = db.Column(db.String(64), index=True, unique=True)
     time_to_bet = db.Column(db.DateTime)
     amount = db.Column(db.Integer)
+    winsetted = db.Column(db.Boolean)
     betting_quote = db.Column(db.String(30))
     posts = db.relationship('Post', backref='title')
     bets = db.relationship('Bet', backref='betted_on')
 
+    winners = db.relationship(
+        'User', secondary=winners, lazy='subquery',
+        backref=db.backref('winners', lazy=True))
+
     challengers = db.relationship(
         'User', secondary=challengers, lazy='subquery',
-        backref=db.backref('users', lazy=True))
+        backref=db.backref('challengers', lazy=True))
 
 class Post(db.Model):
 
@@ -120,7 +131,6 @@ class Bet(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     betonloose = db.Column(db.Boolean)
     amount = db.Column(db.Integer)
-    #challenger = db.Column('challenger', db.String(64), db.ForeignKey('user.username'))
 
     def __repr__(self):
         return '<Amount {}>'.format(self.amount)

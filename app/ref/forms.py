@@ -41,6 +41,17 @@ class EventRegistrationForm(FlaskForm):
     about_event = TextAreaField('Desricption', validators=[Length(min=0, max=140)])
     submit = SubmitField('Create')
 
+class EventValidationForm(FlaskForm):
+
+    def validate_eventname(self, eventname):
+        event = Event.query.filter_by(eventname=eventname.data).first()
+        if event is not None:
+            raise ValidationError('Unvalid eventname.')
+
+    eventname = StringField('Eventname', validators=[DataRequired()])
+    winner = StringField('Winner')
+    submit = SubmitField('Create')
+
 class EventBetForm(FlaskForm):
 
     def __init__(self, original_username, *args, **kwargs):

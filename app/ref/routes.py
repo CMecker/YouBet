@@ -2,8 +2,7 @@ from flask import render_template, redirect, flash, url_for, request
 from app.ref import ref_bp
 from flask_login import current_user, login_user, login_required, logout_user
 from app.models import User, Post, Event, Bet
-from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, \
-    GetCoinForm
+from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, GetCoinForm, EventValidationForm
 from datetime import datetime
 from app import app, db
 
@@ -230,6 +229,31 @@ def validate_event():
                         db.session.commit()
                     db.session.delete(od_ev)
                     db.session.commit()
+    return redirect(url_for('event'))
+
+
+@app.route('/<eventname>/put_winner', methods=['GET', 'POST'])
+@login_required
+def put_winner(eventname):
+    form = EventValidationForm(eventname)
+    if request.method == 'GET':
+        form.eventname.data = eventname
+    return render_template('events/put_winner.html', title='PutWinner', form=form)
+
+@app.route('/add_winner', methods=['POST'])
+@login_required
+def add_winner():
+    winnerName='winner0'
+    eventDb = Event.query.filter_by(eventname=request.form['eventname']).first_or_404()
+    for num in range(0, int(request.form['winner'])):
+        winnerDb = User.query.filter_by(username=request.form[winnerName]).first_or_404()
+        eventDb.add_winner(winnerDb)
+        winnerName=winnerName.replace(str(num), str(num+1))
+    eventDb.winsetted=True
+    db.session.add(eventDb)
+    db.session.commit()
+    flash('Winner set!')
+        
     return redirect(url_for('event'))
 
 
