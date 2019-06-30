@@ -2,7 +2,7 @@ from flask import render_template, redirect, flash, url_for, request
 from app.ref import ref_bp
 from flask_login import current_user, login_user, login_required, logout_user
 from app.models import User, Post, Event, Bet
-from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, GetCoinForm, EventValidationForm
+from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, GetCoinForm, EventWinningForm
 from datetime import datetime
 from app import app, db
 
@@ -213,7 +213,6 @@ def add_challenger():
 def validate_events():
     user = User.query.filter_by(username=current_user.username).first_or_404()
     event = Event.query.all()
-    bets = Bet.query.all()
     if current_user.username != 'admin':
         flash('You are no Admin.')
         return redirect(url_for('event'))
@@ -229,6 +228,31 @@ def validate_events():
                         db.session.commit()
                     db.session.delete(od_ev)
                     db.session.commit()
+    return redirect(url_for('event'))
+
+
+@app.route('/event/<eventname>/validate_event', methods=['GET', 'POST'])
+@login_required
+def validate_event(eventname):
+    user = User.query.filter_by(username=current_user.username).first_or_404()
+    eventDb = Event.query.filter_by(eventname=eventname).first_or_404()
+    bets = Bet.query.filter_by(event_id=eventDb.id).first_or_404()
+    if current_user.username != 'admin':
+        flash('You are no Admin.')
+        return redirect(url_for('event'))
+    else:
+        #diff = eventDb.time_to_bet - datetime.utcnow()
+        import pdb;pdb.set_trace()
+        if eventDb.winsetted:
+            for bettings in eventDb.bets:
+                if bettings.betonloose:
+                    import pdb;pdb.set_trace()
+                else:
+                    winuser = User.query.filter_by(id=bettings.user_id).first_or_404()
+                    winuser.coins = winuser.coins + bettings.amount * 2
+                    db.session.commit()
+            db.session.delete(eventDb)
+            db.session.commit()
     return redirect(url_for('event'))
 
 
