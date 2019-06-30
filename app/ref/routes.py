@@ -73,7 +73,24 @@ def user(username):
     ]
     return render_template('auth/user.html', title='Profile', user=user, posts=posts)
 
-
+@app.route('/user')
+@login_required
+def user_list():
+    query = User.query.all()
+    userlist = []
+    if query:
+        for user in query:
+            userlist.append({
+                'id': user.id,
+                'username': user.username,
+                'about_me': user.about_me,
+                'last_seen': user.last_seen,
+                'coins': user.coins
+            })
+        post = {'title': user, 'body': userlist},
+        return render_template('user_list.html', posts=post)
+    else:
+        return redirect(url_for('index')) #Should be impossible
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
