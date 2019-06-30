@@ -36,6 +36,9 @@
                             <button type="button" class="btn btn-secondary">
                                 <a href="{{ url_for('put_winner', eventname=ev['name']) }}">Set_Win</a>
                             </button>
+                            <button type="button" class="btn btn-secondary">
+                                <a href="{{ url_for('validate_event', eventname=ev['name']) }}">Validate</a>
+                            </button>
                         </td>
                     </tr>
                 {% endfor %}
