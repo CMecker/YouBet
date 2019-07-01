@@ -237,6 +237,7 @@ def event():
 @login_required
 def event_profile(eventname):
     event = Event.query.filter_by(eventname=eventname).first_or_404()
+    time = datetime
     form = PostForm()
     if form.validate_on_submit():
         post = Post(body=form.post.data, author=current_user)
@@ -258,7 +259,7 @@ def event_profile(eventname):
         posts.append({'author': us, 'body': post.body})
 
     return render_template('events/event_profile.html', event=event, posts=posts, form=form,
-                           next_url=next_url,prev_url=prev_url)
+                           next_url=next_url,prev_url=prev_url, time=time)
 
 
 @app.route('/event/create_event', methods=['GET', 'POST'])
@@ -338,7 +339,7 @@ def validate_event(eventname):
             if betsonev:
                 for bettings in betsonev:
                     winnerinbet = User.query.get(bettings.winner_id)
-                    if winnerinbet in evenDb.winners and bettings.betonloose is False:
+                    if winnerinbet in eventDb.winners and bettings.betonloose is False:
                         bettings.user.coins = bettings.user.coins + bettings.amount * 2
                         db.session.delete(bettings)
                     elif winnerinbet not in eventDb.winners and bettings.betonloose is True:
@@ -375,8 +376,8 @@ def add_winner():
     db.session.add(eventDb)
     db.session.commit()
     flash('Winner set!')
-        
     return redirect(url_for('event'))
+
 
 @app.route('/shop', methods=['Get', 'Post'])
 @login_required

@@ -2,11 +2,6 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-	<header>
-		<tr valign="top">
-            <td><h3>Event: {{ event.eventname }}</h3></td><br>
-		</tr>
-	</header>
     <style>
         * {
           box-sizing: border-box;
@@ -33,12 +28,16 @@
             width: 100%;
           }
         }
-
     </style>
+	<header>
+		<tr valign="top">
+            <td><h3>Event: {{ event.eventname }}</h3></td><br>
+		</tr>
+	</header>
     <section>
         <div class="row">
           <div class="column">
-            {% if event.time_to_bet %} BetEnding: {{ event.time_to_bet }} {% endif %}<br>
+            {% if event.time_to_bet %} BetEnding: {{ moment(event.time_to_bet).fromTime(time.now()) }} {% endif %}<br>
             {% if event.amount%} Total Bets: {{ event.amount }} {% endif %}<br>
             {% if event.challengers%} Challengers:
                 {% for dudes in event.challengers %}
@@ -46,7 +45,7 @@
                 {% endfor %}
             {% endif %}
             <hr>
-            <section>
+            <div class="btn-group" role="group" aria-label="EventTasks">
                 <button type="button" class="btn btn-secondary">
                     <a href="{{ url_for('event_bet', eventname=event.eventname) }}">Bet</a>
                 </button>
@@ -56,7 +55,7 @@
                 <button type="button" class="btn btn-secondary">
                     <a href="{{ url_for('edit_event', eventname=event.eventname) }}">Edit Event</a>
                 </button>
-            </section>
+            </div>
           </div>
           <div class="column">
             {% if form %}
