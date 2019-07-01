@@ -197,9 +197,14 @@ def create_event():
 @app.route('/add_challenger', methods=['POST'])
 def add_challenger():
     challName='challenger0'
+    if request.form['time']:
+        time = datetime.strptime(request.form['time_to_bet'] + ";" + request.form['time'], "%Y-%m-%d;%H:%M")
+    else:
+        time = request.form['time_to_bet']
+
     event = Event(
         eventname=request.form['eventname'],
-        time_to_bet=request.form['time_to_bet'],
+        time_to_bet=time,
         description=request.form['description']
     )
     for num in range(0, int(request.form['challenger'])):

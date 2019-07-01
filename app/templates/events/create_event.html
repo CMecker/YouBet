@@ -34,8 +34,16 @@
         <section>
             {{ form.eventname.label }}<br>
             {{ form.eventname(size=32) }}<br>
-            {{ form.time_to_bet.label }}<br>
-            {{ form.time_to_bet(size=32) }}<br>
+            <table>
+                <tr>
+                    <th>{{ form.time_to_bet.label }}</th>
+                    <th>{{ form.time.label }}</th>
+                </tr>
+                <tr>
+                    <th>{{ form.time_to_bet(size=32) }}</th>
+                    <th>{{ form.time(size=32) }}</th>
+                </tr>
+            </table>
             {{ form.description.label }}<br>
             {{ form.description }}<br>
             {% for error in form.eventname.errors %}
