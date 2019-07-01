@@ -50,7 +50,7 @@ class EventWinningForm(FlaskForm):
 
     eventname = StringField('Eventname', validators=[DataRequired()])
     winner = StringField('Winner')
-    submit = SubmitField('Create')
+    submit = SubmitField('Put Winners')
 
 class EventBetForm(FlaskForm):
 
