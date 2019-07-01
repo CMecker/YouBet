@@ -38,7 +38,7 @@ class EventRegistrationForm(FlaskForm):
     eventname = StringField('Eventname', validators=[DataRequired()])
     chll = StringField('Challenger')
     time_to_bet = DateField('TimeToBet', format='%Y-%m-%d', validators=[DataRequired()])
-    about_event = TextAreaField('Desricption', validators=[Length(min=0, max=140)])
+    description = TextAreaField('Desricption', validators=[Length(min=0, max=140)])
     submit = SubmitField('Create')
 
 class EventWinningForm(FlaskForm):

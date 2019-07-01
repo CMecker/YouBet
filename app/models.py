@@ -103,6 +103,7 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     eventname = db.Column(db.String(64), index=True, unique=True)
     time_to_bet = db.Column(db.DateTime)
+    description = db.Column(db.String(250))
     amount = db.Column(db.Integer)
     winsetted = db.Column(db.Boolean, default=False)
     betting_quote = db.Column(db.String(30))
