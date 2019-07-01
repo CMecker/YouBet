@@ -82,14 +82,18 @@ class EditProfileForm(FlaskForm):
         super(EditProfileForm, self).__init__(*args, **kwargs)
         self.original_username = original_username
 
-    def validate_username(self, username):
-        if username.data != self.original_username:
-            user = User.query.filter_by(username=self.username.data).first()
-            if user is not None:
-                raise ValidationError('Unvalid username.')
-    
     username = StringField('Username', validators=[DataRequired()])
     about_me = TextAreaField('Desricption', validators=[Length(min=0, max=140)])
+    submit = SubmitField('Submit')
+
+class EditEventForm(FlaskForm):
+
+    def __init__(self, ename, *args, **kwargs):
+        super(EditEventForm, self).__init__(*args, **kwargs)
+        self.eventname = ename 
+
+    evname = StringField('Eventname', validators=[DataRequired()])
+    about_event = TextAreaField('Desricption', validators=[Length(min=0, max=140)])
     submit = SubmitField('Submit')
     
 
