@@ -72,7 +72,7 @@ def user(username):
     ]
     return render_template('auth/user.html', title='Profile', user=user, posts=posts)
 
-@app.route('/user')
+@app.route('/user_list')
 @login_required
 def user_list():
     query = User.query.all()
