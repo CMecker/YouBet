@@ -269,19 +269,20 @@ def create_event():
     return render_template('events/create_event.html', title='CreateEvent', form=form)
 
 
-@app.route('/event/add_challenger', methods=['POST'])
+@app.route('/add_challenger', methods=['POST'])
 def add_challenger():
     challName='challenger0'
     if request.form['time']:
         time = datetime.strptime(request.form['time_to_bet'] + ";" + request.form['time'], "%Y-%m-%d;%H:%M")
     else:
         time = request.form['time_to_bet']
-
+    import pdb;pdb.set_trace()
     event = Event(
         eventname=request.form['eventname'],
         time_to_bet=time,
         description=request.form['description']
     )
+    event.add_creator(current_user)
     for num in range(0, int(request.form['challenger'])):
         challDb = User.query.filter_by(username=request.form[challName]).first_or_404()
         event.add_challenger(challDb)
@@ -289,7 +290,6 @@ def add_challenger():
     db.session.add(event)
     db.session.commit()
     flash('Creation succeded!')
-        
     return redirect(url_for('event'))
 
 
@@ -305,22 +305,23 @@ def validate_events():
         for one_event in event:
             diff = one_event.time_to_bet - datetime.utcnow()
             if diff.days < 0 and one_event.winsetted:
-                val_ev = Event.query.filter_by(eventname=one_event.eventname).all()
-                for od_ev in val_ev:
-                    betsonev = Bet.query.filter_by(event_id=od_ev.id)
-                    if betsonev:
-                        for bettings in betsonev:
-                            winnerinbet = User.query.get(bettings.winner_id)
-                            if winnerinbet in od_ev.winners and bettings.betonloose is False:
-                                bettings.user.coins = bettings.user.coins + bettings.amount * 2
-                                db.session.delete(bettings)
-                            elif winnerinbet not in od_ev.winners and bettings.betonloose is True:
-                                bettings.user.coins = bettings.user.coins + bettings.amount * 2
-                                db.session.delete(bettings)
-                            else:
-                                db.session.delete(bettings)
-                    db.session.delete(od_ev)
-                    db.session.commit()
+                betsonev = Bet.query.filter_by(event_id=one_event.id)
+                if betsonev:
+                    for bettings in betsonev:
+                        winnerinbet = User.query.filter_by(id=bettings.winner_id).first()
+                        if winnerinbet in one_event.winners and bettings.betonloose is False:
+                            winnerinbet.coins = winnerinbet.coins + bettings.amount * 2
+                            db.session.delete(bettings)
+                            db.session.commit()
+                        elif winnerinbet not in one_event.winners and bettings.betonloose is True:
+                            winnerinbet.coins = winnerinbet.coins + bettings.amount * 2
+                            db.session.delete(bettings)
+                            db.session.commit()
+                        else:
+                            db.session.delete(bettings)
+                            db.session.commit()
+                db.session.delete(od_ev)
+                db.session.commit()
     return redirect(url_for('event'))
 
 
@@ -335,18 +336,21 @@ def validate_event(eventname):
     else:
         diff = eventDb.time_to_bet - datetime.utcnow()
         if diff.days < 0 and eventDb.winsetted:
-            betsonev = Bet.query.filter_by(event_id=eventDb.id)
+            betsonev = Bet.query.filter_by(event_id=one_event.id).first()
             if betsonev:
                 for bettings in betsonev:
-                    winnerinbet = User.query.get(bettings.winner_id)
-                    if winnerinbet in eventDb.winners and bettings.betonloose is False:
-                        bettings.user.coins = bettings.user.coins + bettings.amount * 2
+                    winnerinbet = User.query.filter_by(id=bettings.winner_id).first()
+                    if winnerinbet in one_event.winners and bettings.betonloose is False:
+                        winnerinbet.coins = winnerinbet.coins + bettings.amount * 2
                         db.session.delete(bettings)
-                    elif winnerinbet not in eventDb.winners and bettings.betonloose is True:
-                        bettings.user.coins = bettings.user.coins + bettings.amount * 2
+                        db.session.commit()
+                    elif winnerinbet not in one_event.winners and bettings.betonloose is True:
+                        winnerinbet.coins = winnerinbet.coins + bettings.amount * 2
                         db.session.delete(bettings)
+                        db.session.commit()
                     else:
                         db.session.delete(bettings)
+                        db.session.commit()
             db.session.delete(eventDb)
             db.session.commit()
         elif not eventDb.winsetted:
@@ -399,5 +403,3 @@ def before_request():
     if current_user.is_authenticated:
         current_user.last_seen = datetime.now()
         db.session.commit()
-
-

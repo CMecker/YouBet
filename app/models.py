@@ -19,15 +19,11 @@ winners = db.Table('winners',
         db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
 )
 
-#betwinner = db.Table('betwinner',
-#        db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
-#        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
-#)
-#
-#userbets = db.Table('userbets',
-#        db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
-#        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
-#)
+creator = db.Table('creator',
+        db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
+        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
+
 
 #NEEDING Delete Option
 class User(UserMixin, db.Model):
@@ -100,6 +96,9 @@ class Event(db.Model):
     def add_winner(self, user):
         self.winners.append(user)
 
+    def add_creator(self, user):
+        self.creator.append(user)
+
     id = db.Column(db.Integer, primary_key=True)
     eventname = db.Column(db.String(64), index=True, unique=True)
     time_to_bet = db.Column(db.DateTime)
@@ -116,6 +115,10 @@ class Event(db.Model):
     challengers = db.relationship(
         'User', secondary=challengers, lazy='subquery',
         backref=db.backref('challengers', lazy=True))
+
+    creator = db.relationship(
+        'User', secondary=creator, lazy='subquery',
+        backref=db.backref('creator', lazy=True))
 
 class Post(db.Model):
 
@@ -148,14 +151,6 @@ class Bet(db.Model):
     user = db.relationship('User', foreign_keys=[user_id])
     winner = db.relationship('User', foreign_keys=[winner_id])
     event = db.relationship('Event', foreign_keys=[event_id])
-
-#    userbets = db.relationship(
-#        'User', secondary=userbets, lazy='subquery',
-#        backref=db.backref('userbets', lazy=True))
-#
-#    betwinner = db.relationship(
-#        'User', secondary=betwinner, lazy='subquery',
-#        backref=db.backref('betwinner', lazy=True))
 
     
 @login.user_loader
