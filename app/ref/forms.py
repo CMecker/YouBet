@@ -88,11 +88,11 @@ class EditProfileForm(FlaskForm):
 
 class EditEventForm(FlaskForm):
 
-    def __init__(self, eventname, *args, **kwargs):
+    def __init__(self, ename, *args, **kwargs):
         super(EditEventForm, self).__init__(*args, **kwargs)
-        self.eventname = eventname 
+        self.eventname = ename 
 
-    eventname = StringField('Username', validators=[DataRequired()])
+    evname = StringField('Eventname', validators=[DataRequired()])
     about_event = TextAreaField('Desricption', validators=[Length(min=0, max=140)])
     submit = SubmitField('Submit')
     

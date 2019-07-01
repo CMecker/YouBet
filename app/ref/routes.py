@@ -2,7 +2,7 @@ from flask import render_template, redirect, flash, url_for, request
 from app.ref import ref_bp
 from flask_login import current_user, login_user, login_required, logout_user
 from app.models import User, Post, Event, Bet
-from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, GetCoinForm, EventWinningForm
+from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, GetCoinForm, EventWinningForm, EditEventForm
 from datetime import datetime
 from app import app, db
 
@@ -71,7 +71,8 @@ def user(username):
         {'author': user, 'body': ''},
     ]
     return render_template('auth/user.html', title='Profile', user=user, posts=posts)
-event.
+
+
 @app.route('/user_list')
 @login_required
 def user_list():
@@ -112,16 +113,17 @@ def edit_event(eventname):
     form = EditEventForm(eventname)
     event = Event.query.filter_by(eventname=eventname).first_or_404()
     if form.validate_on_submit():
-        event.eventname = form.eventname.data
-        event.about_event = form.about_event.data
+        event.eventname = form.evname.data
+        event.description = form.about_event.data
         db.session.add(event)
         db.session.commit()
         flash('Changes saved.')
-        return redirect(url_for('event_profile', eventname=eventname))
+        return redirect(url_for('event'))
     elif request.method == 'GET':
-        form.eventname.data = event.eventname
-        form.about_eventname.data = event.about_event
-    return render_template('events/edit_event.html', title='Edit Event', form=form)
+        import pdb;pdb.set_trace()
+        form.evname.data = event.eventname
+        form.about_event.data = event.description
+    return render_template('events/edit_event.html', eventname=event.eventname, title='Edit Event', form=form)
 
 
 @app.route('/event/<eventname>/bet', methods=['GET', 'POST'])
