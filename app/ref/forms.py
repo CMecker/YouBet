@@ -74,7 +74,7 @@ class GetCoinForm(FlaskForm):
 
 
     amount = IntegerField('Amount')
-    submit = SubmitField('Give urself some money')
+    submit = SubmitField()
 
 class EditProfileForm(FlaskForm):
 
