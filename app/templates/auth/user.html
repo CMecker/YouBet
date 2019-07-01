@@ -5,31 +5,32 @@
     <header>
         <h3>This is {{ user.username }}</h3>
     </header>
-    <section>
-	<table>
-		<tr valign="middle">
-			<td><img src="{{ user.avatar(128) }}"></td>
-			<td style="padding-left: 20px">
-                {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
-                {% if user.last_seen %}<p>Last seen on: {{ user.last_seen }}</p>{% endif %}
-                {% if user.coins %}<p>Money in the Bank: {{ user.coins }}</p>{% endif %}
-                <p>{{ user.followers.count() }} followers, {{ user.followed.count() }} following.</p>
-            </td>
-		</tr>
-	</table>
     <hr>
-    <div class="btn-group" role="group" aria-label="EventTasks">
-        {% if user == current_user %}
-        <button><a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored"  href="{{ url_for('edit_profile') }}">Edit your profile</a></button><br>
-        {% elif not current_user.is_following(user) %}
-        <button><a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('follow', username=user.username) }}">Follow</a></button><br>
-        {% else %}
-        <button><p><a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('unfollow', username=user.username) }}">Unfollow</a></button><br>
-        {% endif %}
-        {% if current_user.username == 'admin' %}
-        <button><a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('set_coins', username=user.username) }}">ResetBank</a></button><br>
-        {% endif %}
-        <button><a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" class="mdl-navigation__link" href="{{ url_for('logout') }}">Logout</a></button><br>
-    </div>
+    <section>
+        <table>
+            <tr valign="middle">
+                <td><img src="{{ user.avatar(128) }}"></td>
+                <td style="padding-left: 20px">
+                    {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
+                    {% if user.last_seen %}<p>Last seen on: {{ user.last_seen }}</p>{% endif %}
+                    {% if user.coins %}<p>Money in the Bank: {{ user.coins }}</p>{% endif %}
+                    <p>{{ user.followers.count() }} followers, {{ user.followed.count() }} following.</p>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <div class="btn-group" role="group" aria-label="EventTasks">
+            {% if user == current_user %}
+            <button><a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored"  href="{{ url_for('edit_profile') }}">Edit your profile</a></button><br>
+            {% elif not current_user.is_following(user) %}
+            <button><a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('follow', username=user.username) }}">Follow</a></button><br>
+            {% else %}
+            <button><p><a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('unfollow', username=user.username) }}">Unfollow</a></button><br>
+            {% endif %}
+            {% if current_user.username == 'admin' %}
+            <button><a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" href="{{ url_for('set_coins', username=user.username) }}">ResetBank</a></button><br>
+            {% endif %}
+            <button><a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" class="mdl-navigation__link" href="{{ url_for('logout') }}">Logout</a></button><br>
+        </div>
     </section>
 {% endblock %}
