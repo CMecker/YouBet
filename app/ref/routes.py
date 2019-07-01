@@ -2,7 +2,7 @@ from flask import render_template, redirect, flash, url_for, request
 from app.ref import ref_bp
 from flask_login import current_user, login_user, login_required, logout_user
 from app.models import User, Post, Event, Bet
-from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, GetCoinForm, EventWinningForm
+from app.ref.forms import EventRegistrationForm, RegistrationForm, EditProfileForm, PostForm, LoginForm, EventBetForm, GetCoinForm, EventWinningForm, EditEventForm
 from datetime import datetime
 from app import app, db
 
@@ -72,6 +72,7 @@ def user(username):
     ]
     return render_template('auth/user.html', title='Profile', user=user, posts=posts)
 
+
 @app.route('/user_list')
 @login_required
 def user_list():
@@ -105,6 +106,24 @@ def edit_profile():
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
     return render_template('auth/edit_profile.html', title='Edit Profile', form=form)
+
+@app.route('/<eventname>/edit_event', methods=['GET', 'POST'])
+@login_required
+def edit_event(eventname):
+    form = EditEventForm(eventname)
+    event = Event.query.filter_by(eventname=eventname).first_or_404()
+    if form.validate_on_submit():
+        event.eventname = form.evname.data
+        event.description = form.about_event.data
+        db.session.add(event)
+        db.session.commit()
+        flash('Changes saved.')
+        return redirect(url_for('event'))
+    elif request.method == 'GET':
+        import pdb;pdb.set_trace()
+        form.evname.data = event.eventname
+        form.about_event.data = event.description
+    return render_template('events/edit_event.html', eventname=event.eventname, title='Edit Event', form=form)
 
 
 @app.route('/event/<eventname>/bet', methods=['GET', 'POST'])
@@ -254,7 +273,6 @@ def validate_events():
 def validate_event(eventname):
     user = User.query.filter_by(username=current_user.username).first_or_404()
     eventDb = Event.query.filter_by(eventname=eventname).first_or_404()
-    import pdb;pdb.set_trace()
     if current_user.username != 'admin':
         flash('You are no Admin.')
         return redirect(url_for('event'))
