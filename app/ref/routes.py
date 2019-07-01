@@ -276,12 +276,13 @@ def add_challenger():
         time = datetime.strptime(request.form['time_to_bet'] + ";" + request.form['time'], "%Y-%m-%d;%H:%M")
     else:
         time = request.form['time_to_bet']
-
+    import pdb;pdb.set_trace()
     event = Event(
         eventname=request.form['eventname'],
         time_to_bet=time,
         description=request.form['description']
     )
+    event.add_creator(current_user)
     for num in range(0, int(request.form['challenger'])):
         challDb = User.query.filter_by(username=request.form[challName]).first_or_404()
         event.add_challenger(challDb)
@@ -289,7 +290,6 @@ def add_challenger():
     db.session.add(event)
     db.session.commit()
     flash('Creation succeded!')
-        
     return redirect(url_for('event'))
 
 
@@ -403,5 +403,3 @@ def before_request():
     if current_user.is_authenticated:
         current_user.last_seen = datetime.now()
         db.session.commit()
-
-
