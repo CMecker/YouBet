@@ -6,15 +6,17 @@
         <h3>Not enough coins? Get it Now</h3>
     </header>
     <hr>
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.amount.label }}<br>
-            {{ form.amount(size=32) }}<br>
-            {% for error in form.amount.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
+    <section>
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.amount.label }}<br>
+                {{ form.amount(size=32) }}<br>
+                {% for error in form.amount.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            {{ form.submit(class="btn btn-secondary") }}
+        </form>
+    </section>
 {% endblock %}
