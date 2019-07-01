@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <header>
+        <h3>Edit Event</h3>
+    </header>
+    <hr>
+    <section>
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.eventname.label }}<br>
+                {{ form.eventname(size=32) }}<br>
+                {% for error in form.eventname.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.about_event.label }}<br>
+                {{ form.about_event(cols=50, rows=4) }}<br>
+                {% for error in form.about_event.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>{{ form.submit() }}</p>
+        </form>
+    </section>
+{% endblock %}
