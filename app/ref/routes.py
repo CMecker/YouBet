@@ -197,9 +197,15 @@ def create_event():
 @app.route('/add_challenger', methods=['POST'])
 def add_challenger():
     challName='challenger0'
+    if request.form['time']:
+        time = datetime.strptime(request.form['time_to_bet'] + ";" + request.form['time'], "%Y-%m-%d;%H:%M")
+    else:
+        time = request.form['time_to_bet']
+
     event = Event(
         eventname=request.form['eventname'],
-        time_to_bet=request.form['time_to_bet'],
+        time_to_bet=time,
+        description=request.form['description']
     )
     for num in range(0, int(request.form['challenger'])):
         challDb = User.query.filter_by(username=request.form[challName]).first_or_404()
@@ -313,9 +319,12 @@ def event():
                 eve.amount = 0
             if not eve.betting_quote:
                 eve.betting_quote = '(0,5/0,5)'
+            if not eve.description:
+                eve.description = ''
             eventlist.append({
                 'id': eve.id,
                 'name': eve.eventname,
+                'description': eve.description,
                 'time_to_bet': eve.time_to_bet,
                 'amount': eve.amount,
                 'challenger': challengerlist

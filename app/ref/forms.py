@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, IntegerField, FloatField
-from wtforms.fields.html5 import DateField
+from wtforms.fields.html5 import DateField, TimeField
 from wtforms.validators import DataRequired, ValidationError, DataRequired, Email, EqualTo, Length
+from datetime import datetime
 from app.models import User, Event
 
 class LoginForm(FlaskForm):
@@ -38,7 +39,8 @@ class EventRegistrationForm(FlaskForm):
     eventname = StringField('Eventname', validators=[DataRequired()])
     chll = StringField('Challenger')
     time_to_bet = DateField('TimeToBet', format='%Y-%m-%d', validators=[DataRequired()])
-    about_event = TextAreaField('Desricption', validators=[Length(min=0, max=140)])
+    time = TimeField('Time', format='%H:%M')
+    description = TextAreaField('Desricption', validators=[Length(min=0, max=140)])
     submit = SubmitField('Create')
 
 class EventWinningForm(FlaskForm):
