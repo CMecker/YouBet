@@ -2,51 +2,55 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-    <h3>All Events: </h3>
+    <header>
+        <h3>All Events</h3>
+    </header>
     <hr>
-    <div class="btn-group" role="group" aria-label="EventTasks">
-        <button type="button" class="btn btn-secondary">
-            <a href="{{ url_for('create_event') }}">Create</a>
-        </button>
-        <button type="button" class="btn btn-secondary">
-            <a href="{{ url_for('validate_events') }}">Validate All</a>
-        </button>
-    </div>
-    {% for post in posts %}
-        <div>
-        <table class="table">
-            <thead>
-                <tr>
-		    <th scope="col"> Id </th>
-		    <th scope="col"> Name </th>
-            <th scope="col"> Description </th>
-            <th scope="col"> Deadline</th>
-		    <th scope="col"> Bets made </th>
-		    <th scope="col"> challenger </th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ev in post.body %}
-                    <tr>
-                        <td scope="row"> {{ ev['id'] }} </td>
-                        <td scope="row"> <a href="{{ url_for('event_profile', eventname=ev['name']) }}">{{ ev['name'] }}</a></td>
-                        <td scope="row"> {{ ev['description'] }} </td>
-                        <td scope="row"> {{ ev['time_to_bet'] }} </td>
-                        <td scope="row"> {{ ev['amount'] }} </td>
-			            <td scope="row"> {% for dudes in ev['challenger'] %}<a href="{{ url_for('user', username=dudes ) }}">{{ dudes }}, </a>{% endfor %}</td>
-                        <td scope="row">
-                            <button type="button" class="btn btn-secondary">
-                                <a href="{{ url_for('put_winner', eventname=ev['name']) }}">Set_Win</a>
-                            </button>
-                            <button type="button" class="btn btn-secondary">
-                                <a href="{{ url_for('validate_event', eventname=ev['name']) }}">Validate</a>
-                            </button>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <section>
+        <div class="btn-group" role="group" aria-label="EventTasks">
+            <button type="button" class="btn btn-secondary">
+                <a href="{{ url_for('create_event') }}">Create</a>
+            </button>
+            <button type="button" class="btn btn-secondary">
+                <a href="{{ url_for('validate_events') }}">Validate All</a>
+            </button>
         </div>
-    {% endfor %}
+        {% for post in posts %}
+            <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                <th scope="col"> Id </th>
+                <th scope="col"> Name </th>
+                <th scope="col"> Description </th>
+                <th scope="col"> Deadline</th>
+                <th scope="col"> Bets made </th>
+                <th scope="col"> challenger </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ev in post.body %}
+                        <tr>
+                            <td scope="row"> {{ ev['id'] }} </td>
+                            <td scope="row"> <a href="{{ url_for('event_profile', eventname=ev['name']) }}">{{ ev['name'] }}</a></td>
+                            <td scope="row"> {{ ev['description'] }} </td>
+                            <td scope="row"> {{ ev['time_to_bet'] }} </td>
+                            <td scope="row"> {{ ev['amount'] }} </td>
+                            <td scope="row"> {% for dudes in ev['challenger'] %}<a href="{{ url_for('user', username=dudes ) }}">{{ dudes }}, </a>{% endfor %}</td>
+                            <td scope="row">
+                                <button type="button" class="btn btn-secondary">
+                                    <a href="{{ url_for('put_winner', eventname=ev['name']) }}">Set_Win</a>
+                                </button>
+                                <button type="button" class="btn btn-secondary">
+                                    <a href="{{ url_for('validate_event', eventname=ev['name']) }}">Validate</a>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        {% endfor %}
+    </section>
 {% endblock %}
 
