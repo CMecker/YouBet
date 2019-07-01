@@ -71,7 +71,7 @@ def user(username):
         {'author': user, 'body': ''},
     ]
     return render_template('auth/user.html', title='Profile', user=user, posts=posts)
-
+event.
 @app.route('/user_list')
 @login_required
 def user_list():
@@ -105,6 +105,23 @@ def edit_profile():
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
     return render_template('auth/edit_profile.html', title='Edit Profile', form=form)
+
+@app.route('/<eventname>/edit_event', methods=['GET', 'POST'])
+@login_required
+def edit_event(eventname):
+    form = EditEventForm(eventname)
+    event = Event.query.filter_by(eventname=eventname).first_or_404()
+    if form.validate_on_submit():
+        event.eventname = form.eventname.data
+        event.about_event = form.about_event.data
+        db.session.add(event)
+        db.session.commit()
+        flash('Changes saved.')
+        return redirect(url_for('event_profile', eventname=eventname))
+    elif request.method == 'GET':
+        form.eventname.data = event.eventname
+        form.about_eventname.data = event.about_event
+    return render_template('events/edit_event.html', title='Edit Event', form=form)
 
 
 @app.route('/event/<eventname>/bet', methods=['GET', 'POST'])
@@ -254,7 +271,6 @@ def validate_events():
 def validate_event(eventname):
     user = User.query.filter_by(username=current_user.username).first_or_404()
     eventDb = Event.query.filter_by(eventname=eventname).first_or_404()
-    import pdb;pdb.set_trace()
     if current_user.username != 'admin':
         flash('You are no Admin.')
         return redirect(url_for('event'))
