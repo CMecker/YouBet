@@ -96,6 +96,9 @@ class Event(db.Model):
     def add_winner(self, user):
         self.winners.append(user)
 
+    def add_creator(self, user):
+        self.creator.append(user)
+
     id = db.Column(db.Integer, primary_key=True)
     eventname = db.Column(db.String(64), index=True, unique=True)
     time_to_bet = db.Column(db.DateTime)
