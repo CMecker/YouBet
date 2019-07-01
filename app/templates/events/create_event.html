@@ -2,6 +2,42 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
+    <style>
+        .slidecontainer {
+          width: 100%;
+        }
+
+        .slider {
+          -webkit-appearance: none;
+          width: 100%;
+          height: 25px;
+          background: #d3d3d3;
+          outline: none;
+          opacity: 0.7;
+          -webkit-transition: .2s;
+          transition: opacity .2s;
+        }
+
+        .slider:hover {
+          opacity: 1;
+        }
+
+        .slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 25px;
+          height: 25px;
+          background: #4CAF50;
+          cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+          width: 25px;
+          height: 25px;
+          background: #4CAF50;
+          cursor: pointer;
+        }
+    </style>
     <script type="text/javascript">
         function addChallengerForm() {
             document.getElementById("moreChallengerSec").innerHTML = "Hello World";
@@ -28,21 +64,36 @@
             }
         }
     </script>
-    <h3>Create Event:</h3>
+    <header>
+        <h3>Create Event:</h3>
+    </header>
+    <hr>
     <form action="/add_challenger" method="POST">
         {{ form.hidden_tag() }}
         <section>
             {{ form.eventname.label }}<br>
             {{ form.eventname(size=32) }}<br>
-            {{ form.time_to_bet.label }}<br>
-            {{ form.time_to_bet(size=32) }}<br>
+            <table>
+                <tr>
+                    <th>{{ form.time_to_bet.label }}</th>
+                    <th>{{ form.time.label }}</th>
+                </tr>
+                <tr>
+                    <th>{{ form.time_to_bet(size=32) }}</th>
+                    <th>{{ form.time(size=32) }}</th>
+                </tr>
+            </table>
+            {{ form.description.label }}<br>
+            {{ form.description }}<br>
             {% for error in form.eventname.errors %}
-            <span style="color: red;">[{{ error }}]</span>
+                <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </section>
         <section>
             {{ form.chll.label }}<br>
-            <input type="text" id="countChallenger" name="challenger" value="" size="32">
+            <div class="slidecontainer">
+              <input type="range" min="1" max="10" value="1" class="slider" id="countChallenger" name="challenger">
+            </div>
             <button><a href="#" id="addingChallengerForms" onclick="addFields()">Name Challenger(s)</a></button>
         </section><br>
         <section>{{ form.submit() }}</section>

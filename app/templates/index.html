@@ -2,6 +2,21 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-    <h1>Welcome to YouBet</h1>
-    <p>This website provides you everything you need to bet with your friends!</p>
+    <header>
+        <h1>Welcome to YouBet</h1>
+        <hr>
+        <p>This website provides you everything you need to bet with your friends!</p>
+    </header>
+    <hr>
+    <div class="btn-group" role="group" aria-label="EventTasks">
+        <button type="button" class="btn btn-secondary">
+            <a href="{{ url_for('create_event') }}">Create Your Event</a>
+        </button>
+        <button type="button" class="btn btn-secondary">
+            <a href="{{ url_for('user_list') }}">Search For Friends </a>
+        </button>
+        <button type="button" class="btn btn-secondary">
+            <a href="{{ url_for('edit_profile') }}">Update Your Profile </a>
+        </button>
+    </div>
 {% endblock %}
