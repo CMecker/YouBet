@@ -34,7 +34,9 @@
         </section>
         <section>
             {{ form.winner.label }}<br>
-            <input type="text" id="countWinner" name="winner" value="" size="32">
+            <div class="slidecontainer">
+              <input type="range" min="1" max="10" value="1" class="slider" id="countWinner" name="winner">
+            </div>
             <button><a href="#" id="addingWinnerForms" onclick="addFields()">Name Winners(s)</a></button>
         </section><br>
         <section>{{ form.submit() }}</section>
