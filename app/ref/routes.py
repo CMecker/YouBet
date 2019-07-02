@@ -304,7 +304,7 @@ def validate_events():
         for one_event in event:
             diff = one_event.time_to_bet - datetime.utcnow()
             if diff.days < 0 and one_event.winsetted:
-                betsonev = Bet.query.filter_by(event_id=one_event.id)
+                betsonev = Bet.query.filter_by(event_id=one_event.id).all()
                 if betsonev:
                     for bettings in betsonev:
                         winnerinbet = User.query.filter_by(id=bettings.winner_id).first()
@@ -335,22 +335,22 @@ def validate_event(eventname):
     else:
         diff = eventDb.time_to_bet - datetime.utcnow()
         if diff.days < 0 and eventDb.winsetted:
-            betsonev = Bet.query.filter_by(event_id=one_event.id).first()
+            betsonev = Bet.query.filter_by(event_id=eventDb.id).all()
             if betsonev:
                 for bettings in betsonev:
                     winnerinbet = User.query.filter_by(id=bettings.winner_id).first()
-                    if winnerinbet in one_event.winners and bettings.betonloose is False:
+                    if winnerinbet in eventDb.winners and bettings.betonloose is False:
                         winnerinbet.coins = winnerinbet.coins + bettings.amount * 2
                         db.session.delete(bettings)
                         db.session.commit()
-                    elif winnerinbet not in one_event.winners and bettings.betonloose is True:
+                    elif winnerinbet not in eventDb.winners and bettings.betonloose is True:
                         winnerinbet.coins = winnerinbet.coins + bettings.amount * 2
                         db.session.delete(bettings)
                         db.session.commit()
                     else:
                         db.session.delete(bettings)
                         db.session.commit()
-            db.session.delete(eventDb)
+            #db.session.delete(eventDb)
             db.session.commit()
         elif not eventDb.winsetted:
             flash('No Winner determined yet')
