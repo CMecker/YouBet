@@ -350,7 +350,7 @@ def validate_event(eventname):
                     else:
                         db.session.delete(bettings)
                         db.session.commit()
-            #db.session.delete(eventDb)
+            db.session.delete(eventDb)
             db.session.commit()
         elif not eventDb.winsetted:
             flash('No Winner determined yet')
