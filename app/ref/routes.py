@@ -276,7 +276,6 @@ def add_challenger():
         time = datetime.strptime(request.form['time_to_bet'] + ";" + request.form['time'], "%Y-%m-%d;%H:%M")
     else:
         time = request.form['time_to_bet']
-    import pdb;pdb.set_trace()
     event = Event(
         eventname=request.form['eventname'],
         time_to_bet=time,
