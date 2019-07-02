@@ -24,24 +24,37 @@
                 container.appendChild(document.createElement("br"));
             }
         }
+        function updateSlider(slideAmount) {
+            var sliderDiv = document.getElementById("sliderAmount");
+            sliderDiv.innerHTML = slideAmount;
+        }
     </script>
-    <h3>Set Winner:</h3>
-    <form action="/add_winner" method="POST">
-        {{ form.hidden_tag() }}
-        <section>
-            {{ form.eventname.label }}<br>
-            {{ form.eventname(size=32) }}<br>
-        </section>
-        <section>
-            {{ form.winner.label }}<br>
-            <div class="slidecontainer">
-              <input type="range" min="1" max="10" value="1" class="slider" id="countWinner" name="winner">
-            </div>
-            <button><a href="#" id="addingWinnerForms" onclick="addFields()">Name Winners(s)</a></button>
-        </section><br>
-        <section>{{ form.submit() }}</section>
-        <section id="container"/>
-        <hr>
-    </form>
+    <header>
+        <h3>Set Winner</h3>
+    </header>
+    <hr>
+    <section>
+        <form action="/add_winner" method="POST">
+            {{ form.hidden_tag() }}
+            <section>
+                {{ form.eventname.label }}<br>
+                {{ form.eventname(size=32) }}<br>
+            </section>
+            <section>
+                {{ form.winner.label }}<br>
+                <div class="slidecontainer">
+                    <input type="range" min="1" max="10" value="1" class="slider" id="countWinner" name="winner" onchange="updateSlider(this.value)">
+                    <br>
+                    <span>Number Winners:</span>
+                    <div id="sliderAmount">1</div>
+                </div>
+                <hr>
+                <button><a href="#" id="addingWinnerForms" onclick="addFields()">Name Winners(s)</a></button>
+            </section><br>
+            <section>{{ form.submit() }}</section>
+            <section id="container"/>
+            <hr>
+        </form>
+    </section>
 {% endblock %}
 
