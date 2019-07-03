@@ -309,17 +309,18 @@ def validate_events():
                     for bettings in betsonev:
                         winnerinbet = User.query.filter_by(id=bettings.winner_id).first()
                         if winnerinbet in one_event.winners and bettings.betonloose is False:
-                            winnerinbet.coins = winnerinbet.coins + bettings.amount * 2
-                            db.session.delete(bettings)
+                            winner.coins = winner.coins + bettings.amount * 2
+                            db.session.add(winner)
                             db.session.commit()
+                            db.session.delete(bettings)
                         elif winnerinbet not in one_event.winners and bettings.betonloose is True:
-                            winnerinbet.coins = winnerinbet.coins + bettings.amount * 2
-                            db.session.delete(bettings)
+                            winner.coins = winner.coins + bettings.amount * 2
+                            db.session.add(winner)
                             db.session.commit()
+                            db.session.delete(bettings)
                         else:
                             db.session.delete(bettings)
-                            db.session.commit()
-                db.session.delete(od_ev)
+                db.session.delete(eventDb)
                 db.session.commit()
     return redirect(url_for('event'))
 
@@ -339,17 +340,19 @@ def validate_event(eventname):
             if betsonev:
                 for bettings in betsonev:
                     winnerinbet = User.query.filter_by(id=bettings.winner_id).first()
+                    winner = User.query.filter_by(id=bettings.user_id).first()
                     if winnerinbet in eventDb.winners and bettings.betonloose is False:
-                        winnerinbet.coins = winnerinbet.coins + bettings.amount * 2
-                        db.session.delete(bettings)
+                        winner.coins = winner.coins + bettings.amount * 2
+                        db.session.add(winner)
                         db.session.commit()
+                        db.session.delete(bettings)
                     elif winnerinbet not in eventDb.winners and bettings.betonloose is True:
-                        winnerinbet.coins = winnerinbet.coins + bettings.amount * 2
-                        db.session.delete(bettings)
+                        winner.coins = winner.coins + bettings.amount * 2
+                        db.session.add(winner)
                         db.session.commit()
+                        db.session.delete(bettings)
                     else:
                         db.session.delete(bettings)
-                        db.session.commit()
             db.session.delete(eventDb)
             db.session.commit()
         elif not eventDb.winsetted:
